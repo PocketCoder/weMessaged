@@ -1,13 +1,18 @@
 "use strict";
 const electron = require("electron");
+const os = require("os");
 const path = require("path");
 const fs = require("fs/promises");
 const Database = require("better-sqlite3");
 const utils = require("@electron-toolkit/utils");
+const nodeMacPermissions = require("node-mac-permissions");
 const icon = path.join(__dirname, "../../resources/icon.png");
 electron.ipcMain.handle("open-default", async (event) => {
   try {
-    const data = await fs.readFile("~/Library/Messages/chat.db", "utf8");
+    const data = await fs.readFile(
+      `/Users/${os.userInfo().username}/Library/Messages/chat.db`,
+      "utf8"
+    );
     const db = new Database(data);
     return { success: true, db };
   } catch (err) {
@@ -41,6 +46,13 @@ function createWindow() {
 }
 electron.app.whenReady().then(() => {
   utils.electronApp.setAppUserModelId("com.electron");
+  if (process.platform === "darwin") {
+    const status = nodeMacPermissions.getAuthStatus("full-disk-access");
+    console.log(`Status: ${status}`);
+    if (status === "not determined" || status === "denied") {
+      nodeMacPermissions.askForFullDiskAccess();
+    }
+  }
   electron.app.on("browser-window-created", (_, window) => {
     utils.optimizer.watchWindowShortcuts(window);
   });

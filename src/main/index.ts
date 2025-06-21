@@ -1,13 +1,18 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
+import os from 'os';
 import { join } from 'path';
 import fs from 'fs/promises';
 import Database from 'better-sqlite3';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+import { askForFullDiskAccess, getAuthStatus } from 'node-mac-permissions';
 import icon from '../../resources/icon.png?asset';
 
 ipcMain.handle('open-default', async (event) => {
 	try {
-		const data = await fs.readFile('~/Library/Messages/chat.db', 'utf8');
+		const data = await fs.readFile(
+			`/Users/${os.userInfo().username}/Library/Messages/chat.db`,
+			'utf8'
+		);
 		const db = new Database(data);
 		return { success: true, db };
 	} catch (err: any) {
@@ -53,6 +58,14 @@ function createWindow(): void {
 app.whenReady().then(() => {
 	// Set app user model id for windows
 	electronApp.setAppUserModelId('com.electron');
+
+	if (process.platform === 'darwin') {
+		const status = getAuthStatus('full-disk-access');
+		console.log(`Status: ${status}`);
+		if (status === 'not determined' || status === 'denied') {
+			askForFullDiskAccess();
+		}
+	}
 
 	// Default open or close DevTools by F12 in development
 	// and ignore CommandOrControl + R in production.

@@ -21,10 +21,7 @@ nsis:
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+    - NSSystemAdministrationUsageDescription: 'We need Full Disk Access to get your iMessage history.'
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
