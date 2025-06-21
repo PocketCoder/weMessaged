@@ -1,7 +1,19 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
+import fs from 'fs/promises';
+import Database from 'better-sqlite3';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
+
+ipcMain.handle('open-default', async (event) => {
+	try {
+		const data = await fs.readFile('~/Library/Messages/chat.db', 'utf8');
+		const db = new Database(data);
+		return { success: true, db };
+	} catch (err: any) {
+		return { success: false, error: err.message };
+	}
+});
 
 function createWindow(): void {
 	// Create the browser window.
@@ -48,9 +60,6 @@ app.whenReady().then(() => {
 	app.on('browser-window-created', (_, window) => {
 		optimizer.watchWindowShortcuts(window);
 	});
-
-	// IPC test
-	ipcMain.on('ping', () => console.log('pong'));
 
 	createWindow();
 

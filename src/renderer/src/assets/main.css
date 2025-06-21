@@ -6,22 +6,7 @@ body {
 	justify-content: center;
 	overflow: hidden;
 	user-select: none;
-}
-
-code {
-	font-weight: 600;
-	padding: 3px 5px;
-	border-radius: 2px;
-	background-color: var(--color-background-mute);
-	font-family:
-		ui-monospace,
-		SFMono-Regular,
-		SF Mono,
-		Menlo,
-		Consolas,
-		Liberation Mono,
-		monospace;
-	font-size: 85%;
+	font-family: 'Pixelify Sans Variable', system-ui;
 }
 
 #root {
@@ -31,12 +16,26 @@ code {
 	flex-direction: column;
 }
 
+#button-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	font-weight: normal;
+}
+
 button {
 	background: none;
 	background-color: whitesmoke;
 	border: none;
 	padding: 10px;
 	border: 0.5px solid black;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+	font-family: inherit;
 }
 
 button:hover {

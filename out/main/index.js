@@ -1,8 +1,19 @@
 "use strict";
 const electron = require("electron");
 const path = require("path");
+const fs = require("fs/promises");
+const Database = require("better-sqlite3");
 const utils = require("@electron-toolkit/utils");
 const icon = path.join(__dirname, "../../resources/icon.png");
+electron.ipcMain.handle("open-default", async (event) => {
+  try {
+    const data = await fs.readFile("~/Library/Messages/chat.db", "utf8");
+    const db = new Database(data);
+    return { success: true, db };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
 function createWindow() {
   const mainWindow = new electron.BrowserWindow({
     width: 900,
@@ -33,7 +44,6 @@ electron.app.whenReady().then(() => {
   electron.app.on("browser-window-created", (_, window) => {
     utils.optimizer.watchWindowShortcuts(window);
   });
-  electron.ipcMain.on("ping", () => console.log("pong"));
   createWindow();
   electron.app.on("activate", function() {
     if (electron.BrowserWindow.getAllWindows().length === 0) createWindow();
