@@ -1,0 +1,55 @@
+@import './base.css';
+
+body {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	user-select: none;
+}
+
+code {
+	font-weight: 600;
+	padding: 3px 5px;
+	border-radius: 2px;
+	background-color: var(--color-background-mute);
+	font-family:
+		ui-monospace,
+		SFMono-Regular,
+		SF Mono,
+		Menlo,
+		Consolas,
+		Liberation Mono,
+		monospace;
+	font-size: 85%;
+}
+
+#root {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+button {
+	background: none;
+	background-color: whitesmoke;
+	border: none;
+	padding: 10px;
+	border: 0.5px solid black;
+}
+
+button:hover {
+	cursor: pointer;
+	background-color: ghostwhite;
+}
+
+.left {
+	border-radius: 10px 0 0 10px;
+	border-right: 1px solid gray;
+}
+
+.right {
+	border-radius: 0 10px 10px 0;
+	border-left: none;
+}
