@@ -2,19 +2,24 @@
 const electron = require("electron");
 const os = require("os");
 const path = require("path");
-const fs = require("fs/promises");
+const fs = require("fs");
 const Database = require("better-sqlite3");
 const utils = require("@electron-toolkit/utils");
 const nodeMacPermissions = require("node-mac-permissions");
 const icon = path.join(__dirname, "../../resources/icon.png");
-electron.ipcMain.handle("open-default", async (event) => {
+electron.ipcMain.handle("find-default", () => {
+  return fs.existsSync(
+    `/Users/${os.userInfo().username}/Library/Messages/chat.db`
+  );
+});
+electron.ipcMain.handle("get-contacts", (event) => {
   try {
-    const data = await fs.readFile(
+    const db = new Database(
       `/Users/${os.userInfo().username}/Library/Messages/chat.db`,
-      "utf8"
+      { fileMustExist: true }
     );
-    const db = new Database(data);
-    return { success: true, db };
+    const contacts = db.prepare("SELECT DISTINCT id FROM handle;").all();
+    return { success: true, contacts };
   } catch (err) {
     return { success: false, error: err.message };
   }
@@ -29,8 +34,10 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "../preload/index.js"),
       sandbox: false
-    }
+    },
+    icon: path.join(__dirname, "../renderer/src/assets/icon.png")
   });
+  console.log(path.resolve(__dirname, "../resources/icon.png"));
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();
   });

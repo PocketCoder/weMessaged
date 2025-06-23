@@ -1,20 +1,44 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import os from 'os';
-import { join } from 'path';
-import fs from 'fs/promises';
+import path, { join } from 'path';
+import { existsSync } from 'fs';
 import Database from 'better-sqlite3';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { askForFullDiskAccess, getAuthStatus } from 'node-mac-permissions';
 import icon from '../../resources/icon.png?asset';
 
-ipcMain.handle('open-default', async (event) => {
+ipcMain.handle('find-default', () => {
+	return existsSync(
+		`/Users/${os.userInfo().username}/Library/Messages/chat.db`
+	);
+});
+
+ipcMain.handle('get-contacts', (event) => {
 	try {
-		const data = await fs.readFile(
+		const db = new Database(
 			`/Users/${os.userInfo().username}/Library/Messages/chat.db`,
-			'utf8'
+			{ fileMustExist: true }
 		);
-		const db = new Database(data);
-		return { success: true, db };
+		const contacts = db.prepare('SELECT DISTINCT id FROM handle;').all();
+		//console.log(contacts);
+		/*
+		const chats = db.prepare(`SELECT
+                 *,
+                 c.chat_id,
+                 (SELECT COUNT(*) FROM {MESSAGE_ATTACHMENT_JOIN} a WHERE m.ROWID = a.message_id) as num_attachments,
+                 (SELECT b.chat_id FROM {RECENTLY_DELETED} b WHERE m.ROWID = b.message_id) as deleted_from,
+                 (SELECT COUNT(*) FROM {MESSAGE} m2 WHERE m2.thread_originator_guid = m.guid) as num_replies
+             FROM
+                 message as m
+                 LEFT JOIN {CHAT_MESSAGE_JOIN} as c ON m.ROWID = c.message_id
+             WHERE
+                 c.chat_id IN rarray(?1)
+             ORDER BY
+                 m.date
+             LIMIT
+                 100000;`);
+		console.log(chats.run());*/
+		return { success: true, contacts: contacts };
 	} catch (err: any) {
 		return { success: false, error: err.message };
 	}
@@ -33,6 +57,7 @@ function createWindow(): void {
 			sandbox: false,
 		},
 	});
+	console.log(path.resolve(__dirname, '../resources/icon.png'));
 
 	mainWindow.on('ready-to-show', () => {
 		mainWindow.show();

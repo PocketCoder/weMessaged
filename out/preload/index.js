@@ -2,7 +2,8 @@
 const electron = require("electron");
 const preload = require("@electron-toolkit/preload");
 const api = {
-  readFileAtPath: (filePath) => electron.ipcRenderer.invoke("open-default", filePath)
+  readFileAtPath: (filePath) => electron.ipcRenderer.invoke("get-contacts", filePath),
+  findDefault: () => electron.ipcRenderer.invoke("find-default")
 };
 if (process.contextIsolated) {
   try {

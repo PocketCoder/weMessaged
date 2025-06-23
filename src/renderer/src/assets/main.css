@@ -16,7 +16,25 @@ body {
 	flex-direction: column;
 }
 
-#button-container {
+button {
+	background: none;
+	background-color: whitesmoke;
+	border: none;
+	padding: 10px;
+	border: 0.5px solid black;
+	font-family: inherit;
+}
+
+button:has(img) {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 7px;
+}
+
+#button-container,
+#create-container {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
@@ -24,23 +42,13 @@ body {
 	font-weight: normal;
 }
 
-button {
-	background: none;
-	background-color: whitesmoke;
-	border: none;
-	padding: 10px;
-	border: 0.5px solid black;
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	gap: 5px;
-	font-family: inherit;
-}
-
 button:hover {
 	cursor: pointer;
-	background-color: ghostwhite;
+	background-color: #f8f8ff;
+}
+
+input {
+	font-family: inherit;
 }
 
 .left {
@@ -51,4 +59,13 @@ button:hover {
 .right {
 	border-radius: 0 10px 10px 0;
 	border-left: none;
+}
+
+.select__control {
+	margin: 10px;
+	width: 300px;
+}
+
+#create-container button {
+	border-radius: 10px;
 }
