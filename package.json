@@ -34,7 +34,9 @@
 		"@electron/rebuild": "^4.0.1",
 		"@fontsource-variable/pixelify-sans": "^5.2.6",
 		"better-sqlite3": "^11.10.0",
-		"node-mac-permissions": "^2.5.0"
+		"clsx": "^2.1.1",
+		"node-mac-permissions": "^2.5.0",
+		"react-select": "^5.10.1"
 	},
 	"devDependencies": {
 		"@electron-toolkit/eslint-config-prettier": "^3.0.0",
