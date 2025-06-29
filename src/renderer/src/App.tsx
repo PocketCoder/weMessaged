@@ -38,6 +38,9 @@ function App(): React.JSX.Element {
 
 	return (
 		<>
+			{phoneNumbers.length === 0 ?
+				<span>1. Select a database to begin...</span>
+			:	<></>}
 			<div id="button-container">
 				<button
 					className={'left'}
@@ -52,18 +55,24 @@ function App(): React.JSX.Element {
 					<img src={folder} width="32px" height="32px" alt="folder" />
 				</button>
 			</div>
-			<div id="create-container">
-				<Select
-					isMulti
-					name="contacts"
-					options={phoneNumbers}
-					classNamePrefix={'select'}
-				/>
-				<button>
-					Create
-					<img src={write} width={'21px'} height={'21px'} alt="Pen" />
-				</button>
-			</div>
+			{phoneNumbers.length === 0 ?
+				<></>
+			:	<div id="choose-contacts">
+					<span>2. Choose the contacts to include in your book...</span>
+					<div id="create-container">
+						<Select
+							isMulti
+							name="contacts"
+							options={phoneNumbers}
+							classNamePrefix={'select'}
+						/>
+						<button>
+							Create
+							<img src={write} width={'21px'} height={'21px'} alt="Pen" />
+						</button>
+					</div>
+				</div>
+			}
 			{loading ?
 				<span>Loading...</span>
 			:	<></>}
