@@ -47,6 +47,8 @@ ipcMain.handle('get-contacts', (event) => {
 function createWindow(): void {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
+		titleBarStyle: 'hidden',
+		...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
 		width: 900,
 		height: 670,
 		show: false,

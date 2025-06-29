@@ -1,19 +1,34 @@
 @import './base.css';
 
-body {
+.titlebar {
+	height: 30px;
+	background: whitesmoke;
+	background: linear-gradient(
+		180deg,
+		rgba(245, 245, 245, 1) 0%,
+		rgba(255, 255, 255, 1) 100%
+	);
+	color: black;
 	display: flex;
-	align-items: center;
 	justify-content: center;
-	overflow: hidden;
+	align-items: center;
 	user-select: none;
+	app-region: drag;
+}
+
+body {
+	margin: 0;
 	font-family: 'Pixelify Sans Variable', system-ui;
 }
 
 #root {
+	height: calc(100vh - 30px);
+	width: 100vw;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
+	overflow: hidden;
 }
 
 button {
@@ -68,4 +83,8 @@ input {
 
 #create-container button {
 	border-radius: 10px;
+}
+
+#choose-contacts {
+	margin-top: 10px;
 }
