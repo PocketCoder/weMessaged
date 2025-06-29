@@ -26,6 +26,8 @@ electron.ipcMain.handle("get-contacts", (event) => {
 });
 function createWindow() {
   const mainWindow = new electron.BrowserWindow({
+    titleBarStyle: "hidden",
+    ...process.platform !== "darwin" ? { titleBarOverlay: true } : {},
     width: 900,
     height: 670,
     show: false,
@@ -34,8 +36,7 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "../preload/index.js"),
       sandbox: false
-    },
-    icon: path.join(__dirname, "../renderer/src/assets/icon.png")
+    }
   });
   console.log(path.resolve(__dirname, "../resources/icon.png"));
   mainWindow.on("ready-to-show", () => {
