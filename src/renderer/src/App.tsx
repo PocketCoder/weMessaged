@@ -2,23 +2,29 @@ import folder from './assets/folder.svg';
 import computer from './assets/computer.svg';
 import write from './assets/write.svg';
 import { useEffect, useState } from 'react';
-import Select from 'react-select';
+import Select, { MultiValue } from 'react-select';
+
+type ContactOption = {
+	value: string;
+	label: string;
+};
 
 function App(): React.JSX.Element {
 	const [exists, setExists] = useState<boolean | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
-	const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
+	const [phoneNumbers, setPhoneNumbers] = useState<ContactOption[]>([]);
+	const [selectedContacts, setSelectedContacts] = useState<ContactOption[]>([]);
 
 	async function findDefault(): Promise<boolean> {
 		return await window.electron.ipcRenderer.invoke('find-default');
 	}
 
-	const handleDefaultClick = async (): Promise<void> => {
+	async function handleDefaultClick(): Promise<void> {
 		setLoading(true);
 		const result = await window.electron.ipcRenderer.invoke('get-contacts');
 		setLoading(false);
 		if (result.success) {
-			const options = result.contacts.map((item) => ({
+			const options = result.contacts.map((item: { id: string }) => ({
 				value: item.id,
 				label: item.id,
 			}));
@@ -26,7 +32,23 @@ function App(): React.JSX.Element {
 		} else {
 			console.error('Error reading file:', result.error);
 		}
-	};
+	}
+
+	async function handleCreateClick(): Promise<void> {
+		if (selectedContacts.length === 0) {
+			alert('Please select at least one contact.');
+			return;
+		}
+		const contactIds = selectedContacts.map((contact) => contact.value);
+		setLoading(true);
+		const result = await window.electron.ipcRenderer.invoke(
+			'get-messages',
+			contactIds
+		);
+		setLoading(false);
+		if (!result.success) console.error('Error getting messages:', result.error);
+		console.log(result.messages);
+	}
 
 	useEffect(() => {
 		const checkDefault = async () => {
@@ -65,8 +87,11 @@ function App(): React.JSX.Element {
 							name="contacts"
 							options={phoneNumbers}
 							classNamePrefix={'select'}
+							onChange={(selected: MultiValue<ContactOption>) =>
+								setSelectedContacts(selected as ContactOption[])
+							}
 						/>
-						<button>
+						<button onClick={handleCreateClick}>
 							Create
 							<img src={write} width={'21px'} height={'21px'} alt="Pen" />
 						</button>

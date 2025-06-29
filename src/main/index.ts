@@ -1,48 +1,82 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import os from 'os';
-import path, { join } from 'path';
+import { join } from 'path';
 import { existsSync } from 'fs';
-import Database from 'better-sqlite3';
+import Database, { Database as DatabaseType } from 'better-sqlite3';
+import { Message } from '../renderer/src/lib/types';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { askForFullDiskAccess, getAuthStatus } from 'node-mac-permissions';
 import icon from '../../resources/icon.png?asset';
+import { Event } from 'electron/main';
+import { convertAppleDateInt } from '../renderer/src/lib/utils';
 
-ipcMain.handle('find-default', () => {
+let db: DatabaseType;
+
+ipcMain.handle('find-default', (): boolean => {
 	return existsSync(
 		`/Users/${os.userInfo().username}/Library/Messages/chat.db`
 	);
 });
 
-ipcMain.handle('get-contacts', (event) => {
-	try {
-		const db = new Database(
-			`/Users/${os.userInfo().username}/Library/Messages/chat.db`,
-			{ fileMustExist: true }
-		);
-		const contacts = db.prepare('SELECT DISTINCT id FROM handle;').all();
-		//console.log(contacts);
-		/*
-		const chats = db.prepare(`SELECT
-                 *,
-                 c.chat_id,
-                 (SELECT COUNT(*) FROM {MESSAGE_ATTACHMENT_JOIN} a WHERE m.ROWID = a.message_id) as num_attachments,
-                 (SELECT b.chat_id FROM {RECENTLY_DELETED} b WHERE m.ROWID = b.message_id) as deleted_from,
-                 (SELECT COUNT(*) FROM {MESSAGE} m2 WHERE m2.thread_originator_guid = m.guid) as num_replies
-             FROM
-                 message as m
-                 LEFT JOIN {CHAT_MESSAGE_JOIN} as c ON m.ROWID = c.message_id
-             WHERE
-                 c.chat_id IN rarray(?1)
-             ORDER BY
-                 m.date
-             LIMIT
-                 100000;`);
-		console.log(chats.run());*/
-		return { success: true, contacts: contacts };
-	} catch (err: any) {
-		return { success: false, error: err.message };
+ipcMain.handle(
+	'get-contacts',
+	(
+		event: Event
+	): { success: boolean; contacts?: { id: string }[]; error?: any } => {
+		// TODO: Handle file path begin given.
+		try {
+			db = new Database(
+				`/Users/${os.userInfo().username}/Library/Messages/chat.db`,
+				{ fileMustExist: true }
+			);
+			const contacts = db.prepare('SELECT DISTINCT id FROM handle;').all() as {
+				id: string;
+			}[];
+			return { success: true, contacts: contacts };
+		} catch (err: any) {
+			return { success: false, error: err.message };
+		}
 	}
-});
+);
+
+ipcMain.handle(
+	'get-messages',
+	(
+		event: Event,
+		contacts: String[]
+	): { success: boolean; messages?: Message[]; error?: any } => {
+		const placeholders = contacts.map(() => '?').join(',');
+		try {
+			if (contacts.length === 0) {
+				return { success: false, error: 'No contacts in array' };
+			}
+			const sql = `
+				SELECT
+					m.ROWID            AS message_id,
+					h.id               AS other_party,     -- the number or contact identifier
+					m.is_from_me       AS from_me_flag,    -- 1 if sent by you, 0 if received
+					m.text             AS message_text,
+					m.date             AS apple_date_int,  -- macOS timestamp (seconds since 2001-01-01)
+					m.date_read        AS date_read_int,
+					m.date_delivered   AS date_delivered_int
+				FROM   message AS m
+				JOIN   handle  AS h
+				ON   h.ROWID = m.handle_id
+				WHERE  h.id IN (${placeholders});
+			`;
+			const stmt = db.prepare(sql);
+			const messages = stmt.all(...contacts) as Message[];
+			const newMessages = messages.map((m) => ({
+				...m,
+				converted_date: convertAppleDateInt(m.apple_date_int),
+			}));
+			return { success: true, messages: newMessages };
+		} catch (err: any) {
+			console.log(err);
+			return { success: false, error: err.message };
+		}
+	}
+);
 
 function createWindow(): void {
 	// Create the browser window.
@@ -59,7 +93,6 @@ function createWindow(): void {
 			sandbox: false,
 		},
 	});
-	console.log(path.resolve(__dirname, '../resources/icon.png'));
 
 	mainWindow.on('ready-to-show', () => {
 		mainWindow.show();

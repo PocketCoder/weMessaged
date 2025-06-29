@@ -6,6 +6,8 @@ const api = {
 	readFileAtPath: (filePath: string) =>
 		ipcRenderer.invoke('get-contacts', filePath),
 	findDefault: () => ipcRenderer.invoke('find-default'),
+	getMessages: (contacts: string[]) =>
+		ipcRenderer.invoke('get-messages', contacts),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
