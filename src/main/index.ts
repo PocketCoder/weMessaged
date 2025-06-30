@@ -23,7 +23,6 @@ ipcMain.handle(
 	(
 		event: Event
 	): { success: boolean; contacts?: { id: string }[]; error?: any } => {
-		// TODO: Handle file path begin given.
 		try {
 			db = new Database(
 				`/Users/${os.userInfo().username}/Library/Messages/chat.db`,
@@ -75,6 +74,40 @@ ipcMain.handle(
 			console.log(err);
 			return { success: false, error: err.message };
 		}
+	}
+);
+
+ipcMain.handle(
+	'generate-pdf',
+	(
+		event: Event,
+		data: { authors: string; title: string; acknowledgements: string },
+		messages: Message[]
+	) => {
+		const previewWindow = new BrowserWindow({
+			titleBarStyle: 'hidden',
+			...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
+			width: 900,
+			height: 670,
+			show: false,
+			autoHideMenuBar: true,
+			...(process.platform === 'linux' ? { icon } : {}),
+			webPreferences: {
+				preload: join(__dirname, '../preload/index.js'),
+				sandbox: false,
+			},
+		});
+		previewWindow.on('ready-to-show', () => previewWindow.show());
+		if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+			previewWindow.loadURL(
+				`${process.env['ELECTRON_RENDERER_URL']}/src/document/book.html`
+			);
+		} else {
+			previewWindow.loadFile(join(__dirname, '../renderer/book.html'));
+		}
+		previewWindow.webContents.on('did-finish-load', () => {
+			previewWindow.webContents.send('pdf-data', data, messages);
+		});
 	}
 );
 

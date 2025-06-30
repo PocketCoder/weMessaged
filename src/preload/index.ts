@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
+import { Message } from '../renderer/src/lib/types';
 
 // Custom APIs for renderer
 const api = {
@@ -8,6 +9,10 @@ const api = {
 	findDefault: () => ipcRenderer.invoke('find-default'),
 	getMessages: (contacts: string[]) =>
 		ipcRenderer.invoke('get-messages', contacts),
+	generatePdf: (
+		data: { authors: string; title: string; acknowledgements: string },
+		messages: Message[]
+	) => ipcRenderer.invoke('generate-pdf', data, messages),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

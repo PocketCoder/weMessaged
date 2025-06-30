@@ -47,7 +47,19 @@ function App(): React.JSX.Element {
 		);
 		setLoading(false);
 		if (!result.success) console.error('Error getting messages:', result.error);
-		console.log(result.messages);
+		try {
+			await window.electron.ipcRenderer.invoke(
+				'generate-pdf',
+				{
+					authors: 'Jake',
+					title: 'Test title',
+					acknowledgements: 'Test Acknowledgements.',
+				},
+				result.messages
+			);
+		} catch (error) {
+			console.error('Error invoking PDF generation:', error);
+		}
 	}
 
 	useEffect(() => {
