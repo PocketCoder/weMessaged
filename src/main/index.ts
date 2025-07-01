@@ -52,16 +52,22 @@ ipcMain.handle(
 			const sql = `
 				SELECT
 					m.ROWID            AS message_id,
-					h.id               AS other_party,     -- the number or contact identifier
-					m.is_from_me       AS from_me_flag,    -- 1 if sent by you, 0 if received
+					c.chat_identifier  AS other_party,
+					m.is_from_me       AS from_me_flag,
 					m.text             AS message_text,
-					m.date             AS apple_date_int,  -- macOS timestamp (seconds since 2001-01-01)
+					m.date             AS apple_date_int,
 					m.date_read        AS date_read_int,
 					m.date_delivered   AS date_delivered_int
-				FROM   message AS m
-				JOIN   handle  AS h
-				ON   h.ROWID = m.handle_id
-				WHERE  h.id IN (${placeholders});
+				FROM
+					message AS m
+				JOIN
+					chat_message_join AS cmj ON m.ROWID = cmj.message_id
+				JOIN
+					chat AS c ON cmj.chat_id = c.ROWID
+				WHERE
+					c.chat_identifier IN (${placeholders})
+				ORDER BY
+					m.date;
 			`;
 			const stmt = db.prepare(sql);
 			const messages = stmt.all(...contacts) as Message[];
