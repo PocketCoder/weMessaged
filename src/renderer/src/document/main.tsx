@@ -1,4 +1,3 @@
-import '@fontsource-variable/pixelify-sans';
 import '../assets/main.css';
 
 import { StrictMode } from 'react';
