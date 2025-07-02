@@ -8,6 +8,17 @@ import {
 } from '@react-pdf/renderer';
 import { Message } from '@renderer/lib/types';
 
+function groupMessagesByMonth(messages: Message[]): Record<string, Message[]> {
+	const grouped: Record<string, Message[]> = {};
+	messages.forEach((msg) => {
+		const date = new Date(msg.converted_date!);
+		const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+		if (!grouped[monthYear]) grouped[monthYear] = [];
+		grouped[monthYear].push(msg);
+	});
+	return grouped;
+}
+
 Font.register({
 	family: 'Literata',
 	src: '../assets/Literata/static/Literata-Regular.ttf',
@@ -20,30 +31,35 @@ Font.register({
 	fontWeight: 400,
 });
 
+Font.register({
+	family: 'SanFrancisco',
+	src: '../assets/SFUIText-Regular.otf',
+	fontStyle: 'normal',
+	fontWeight: 'normal',
+});
+
 Font.registerEmojiSource({
 	format: 'png',
 	url: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/',
 });
 
-function groupMessagesByMonth(messages: Message[]): Record<string, Message[]> {
-	const grouped: Record<string, Message[]> = {};
-	messages.forEach((msg) => {
-		const date = new Date(msg.converted_date!);
-		const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-		if (!grouped[monthYear]) grouped[monthYear] = [];
-		grouped[monthYear].push(msg);
-	});
-	return grouped;
-}
-
 const styles = StyleSheet.create({
 	page: {
 		fontFamily: 'Literata',
-		padding: 20,
+		padding: 50,
+	},
+	titlePage: {
+		textAlign: 'center',
+		fontSize: 12,
+		fontFamily: 'Literata',
+		flexDirection: 'column',
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 	acknowledgementsPage: {
 		textAlign: 'center',
 		fontSize: 12,
+		fontFamily: 'Literata',
 		fontStyle: 'italic',
 		flexDirection: 'column',
 		justifyContent: 'center',
@@ -54,12 +70,13 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		textAlign: 'center',
 		paddingTop: 60,
-		paddingBottom: 100,
+		paddingBottom: 80,
 	},
 	dateText: {
 		fontSize: 8,
 	},
 	message: {
+		fontFamily: 'SanFrancisco',
 		paddingVertical: 20,
 		fontSize: 11,
 	},
@@ -68,6 +85,12 @@ const styles = StyleSheet.create({
 	},
 	themText: {
 		textAlign: 'left',
+	},
+	pageNumber: {
+		position: 'absolute',
+		fontSize: 8,
+		bottom: 20,
+		right: 20,
 	},
 });
 
@@ -82,14 +105,24 @@ function Book({
 	console.log(grouped);
 	return (
 		<Document title={data.title} author={data.authors} creator={data.authors}>
-			<Page size="A5" style={[styles.page, styles.acknowledgementsPage]}>
+			<Page size="A5" style={[styles.page, styles.titlePage]}>
 				<View>
 					<Text>{data.title}</Text>
+				</View>
+			</Page>
+			<Page size="A5"></Page>
+			<Page size="A5" style={[styles.page, styles.acknowledgementsPage]}>
+				<View>
 					<Text>{data.acknowledgements}</Text>
 				</View>
 			</Page>
 			{Object.keys(grouped).map((month, i) => (
 				<Page size="A5" style={[styles.page, styles.monthPage]} key={i}>
+					<Text
+						fixed
+						render={({ pageNumber }) => pageNumber}
+						style={styles.pageNumber}
+					/>
 					<View>
 						<Text style={[styles.monthPageTitle]}>{month}</Text>
 						{grouped[month].map((message, j) => (
@@ -100,8 +133,13 @@ function Book({
 									message.from_me_flag ? styles.meText : styles.themText,
 									styles.message,
 								]}
+								minPresenceAhead={100}
 							>
-								<Text>{message.message_text}</Text>
+								<Text>
+									{message.message_text.includes('\ufffc') ?
+										'Attachment'
+									:	message.message_text}
+								</Text>
 								<Text style={[styles.dateText]}>
 									{new Date(message.converted_date as string).toDateString()}
 								</Text>
