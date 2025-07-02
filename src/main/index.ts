@@ -101,6 +101,8 @@ ipcMain.handle(
 			webPreferences: {
 				preload: join(__dirname, '../preload/index.js'),
 				sandbox: false,
+				nodeIntegration: true,
+				contextIsolation: false,
 			},
 		});
 		previewWindow.on('ready-to-show', () => previewWindow.show());
