@@ -17,7 +17,7 @@ importers:
       '@electron/rebuild':
         specifier: ^4.0.1
         version: 4.0.1
-      '@fontsource-variable/pixelify-sans':
+      '@fontsource-variable/eb-garamond':
         specifier: ^5.2.6
         version: 5.2.6
       '@react-pdf/renderer':
@@ -503,8 +503,8 @@ packages:
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
 
-  '@fontsource-variable/pixelify-sans@5.2.6':
-    resolution: {integrity: sha512-unHf6GS+5YkEHZZNCIOB+P6vqUU5YW91hRDjAgU4iA2wrPmG+hbj4Xy3jsVD7nklFM62Q3QnD9dU2ZTFF/is9A==}
+  '@fontsource-variable/eb-garamond@5.2.6':
+    resolution: {integrity: sha512-7WNOTFudWYYSiTmaRlTQO0GwS8UQeCVzrluVsRQY5ueDlrUzCwlCQdbGJ4IxGchYqgqB4ehOqX3jjTxBpJyNeA==}
 
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
@@ -3731,7 +3731,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@fontsource-variable/pixelify-sans@5.2.6': {}
+  '@fontsource-variable/eb-garamond@5.2.6': {}
 
   '@gar/promisify@1.1.3': {}
 

@@ -32,7 +32,7 @@
 		"@electron-toolkit/preload": "^3.0.1",
 		"@electron-toolkit/utils": "^4.0.0",
 		"@electron/rebuild": "^4.0.1",
-		"@fontsource-variable/pixelify-sans": "^5.2.6",
+		"@fontsource-variable/eb-garamond": "^5.2.6",
 		"@react-pdf/renderer": "^4.3.0",
 		"better-sqlite3": "^11.10.0",
 		"clsx": "^2.1.1",
