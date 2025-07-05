@@ -64,6 +64,11 @@ button:hover {
 	background-color: #f8f8ff;
 }
 
+#save {
+	border-radius: 5px;
+	padding: 5px 10px;
+}
+
 input {
 	font-family: inherit;
 }

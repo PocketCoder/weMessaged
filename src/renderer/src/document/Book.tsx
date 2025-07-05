@@ -80,6 +80,10 @@ const styles = StyleSheet.create({
 		paddingVertical: 20,
 		fontSize: 11,
 	},
+	attachment: {
+		fontFamily: 'Courier',
+		fontStyle: 'italic',
+	},
 	meText: {
 		textAlign: 'right',
 	},
@@ -116,6 +120,7 @@ function Book({
 					<Text>{data.acknowledgements}</Text>
 				</View>
 			</Page>
+			<Page size="A5"></Page>
 			{Object.keys(grouped).map((month, i) => (
 				<Page size="A5" style={[styles.page, styles.monthPage]} key={i}>
 					<Text
@@ -130,8 +135,11 @@ function Book({
 								key={j}
 								wrap={false}
 								style={[
-									message.from_me_flag ? styles.meText : styles.themText,
 									styles.message,
+									message.from_me_flag ? styles.meText : styles.themText,
+									message.message_text.includes('\ufffc') ?
+										styles.attachment
+									:	{},
 								]}
 								minPresenceAhead={100}
 							>
