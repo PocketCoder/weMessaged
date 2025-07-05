@@ -9,10 +9,11 @@ const api = {
 	findDefault: () => ipcRenderer.invoke('find-default'),
 	getMessages: (contacts: string[]) =>
 		ipcRenderer.invoke('get-messages', contacts),
-	generatePdf: (
+	generatePDF: (
 		data: { authors: string; title: string; acknowledgements: string },
 		messages: Message[]
 	) => ipcRenderer.invoke('generate-pdf', data, messages),
+	savePDF: (buffer: Uint8Array) => ipcRenderer.invoke('save-pdf', buffer),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

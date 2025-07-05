@@ -1,5 +1,6 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron';
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron';
 import os from 'os';
+import fs from 'fs';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import Database, { Database as DatabaseType } from 'better-sqlite3';
@@ -118,6 +119,22 @@ ipcMain.handle(
 		});
 	}
 );
+
+ipcMain.handle('save-pdf', (event: Event, data: Uint8Array) => {
+	const saveLoc = dialog.showSaveDialogSync({
+		properties: ['createDirectory'],
+		defaultPath: 'iMessage-book.pdf'
+	});
+
+	if (saveLoc) {
+		try {
+			fs.writeFileSync(saveLoc, Buffer.from(data));
+		} catch (e: any) {
+			dialog.showErrorBox('Error saving file', e.message);
+			console.error(e);
+		}
+	}
+});
 
 function createWindow(): void {
 	// Create the browser window.

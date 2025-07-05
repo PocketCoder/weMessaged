@@ -1,4 +1,4 @@
-import { PDFViewer } from '@react-pdf/renderer';
+import { pdf, PDFViewer } from '@react-pdf/renderer';
 import { Message } from '@renderer/lib/types';
 import { useEffect, useState } from 'react';
 import Book from './Book';
@@ -22,10 +22,25 @@ function App(): React.JSX.Element {
 		return <h1>Loading....</h1>;
 	}
 
-	return (
-		<PDFViewer width={'100%'} height={'100%'}>
+	async function savePDF() {
+		const blob = await pdf(
 			<Book data={metadata} messages={messages} />
-		</PDFViewer>
+		).toBlob();
+		const arrayBuffer = await blob.arrayBuffer();
+		window.electron.ipcRenderer.invoke('save-pdf', new Uint8Array(arrayBuffer));
+	}
+
+	return (
+		<>
+			<div>
+				<button id="save" onClick={savePDF}>
+					Save
+				</button>
+			</div>
+			<PDFViewer width={'100%'} height={'100%'} showToolbar={false}>
+				<Book data={metadata} messages={messages} />
+			</PDFViewer>
+		</>
 	);
 }
 
