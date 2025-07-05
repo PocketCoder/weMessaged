@@ -1,4 +1,4 @@
-import '@fontsource-variable/pixelify-sans';
+import '@fontsource-variable/eb-garamond';
 import './assets/main.css';
 
 import { StrictMode } from 'react';
