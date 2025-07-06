@@ -70,3 +70,4 @@ jobs:
           files: |
             dist/mac/*
           draft: true
+          token: ${{ secrets.GH_TOKEN }}
