@@ -59,15 +59,16 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - name: Download all artifacts
+      - name: Download macOS artifact
         uses: actions/download-artifact@v4
         with:
-          path: dist/mac/*
+          name: dist-macos-latest
+          path: release-artifacts
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/mac/*
+            release-artifacts/*
           draft: true
           token: ${{ secrets.GH_TOKEN }}
