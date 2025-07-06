@@ -69,3 +69,4 @@ jobs:
           files: |
             dist/mac/*
           draft: true
+          token: ${{ secrets.GITHUB_TOKEN }}
