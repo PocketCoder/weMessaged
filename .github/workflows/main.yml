@@ -51,7 +51,7 @@ jobs:
         with:
           compression-level: 0
           name: dist-${{ matrix.os }}
-          path: dist/mac/
+          path: dist/mac-arm64/
 
   release:
     runs-on: ubuntu-latest
