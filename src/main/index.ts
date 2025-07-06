@@ -31,7 +31,7 @@ ipcMain.handle(
       }[];
       return { success: true, contacts: contacts };
     } catch (err: unknown) {
-      return { success: false, error: err.message };
+      return { success: false, error: (err as Error).message };
     }
   },
 );
@@ -76,7 +76,7 @@ ipcMain.handle(
       return { success: true, messages: newMessages };
     } catch (err: unknown) {
       console.log(err);
-      return { success: false, error: err.message };
+      return { success: false, error: (err as Error).message };
     }
   },
 );
@@ -127,7 +127,7 @@ ipcMain.handle("save-pdf", (_, data: Uint8Array) => {
     try {
       fs.writeFileSync(saveLoc, Buffer.from(data));
     } catch (e: unknown) {
-      dialog.showErrorBox("Error saving file", e.message);
+      dialog.showErrorBox("Error saving file", (e as Error).message);
       console.error(e);
     }
   }
