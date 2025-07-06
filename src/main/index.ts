@@ -7,7 +7,7 @@ import Database, { Database as DatabaseType } from "better-sqlite3";
 import { Message } from "../renderer/src/lib/types";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import { askForFullDiskAccess, getAuthStatus } from "node-mac-permissions";
-import icon from "../../resources/icon.png?asset";
+
 import { convertAppleDateInt } from "../renderer/src/lib/utils";
 
 let db: DatabaseType;
@@ -142,7 +142,6 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === "linux" ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
