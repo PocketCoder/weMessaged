@@ -1,100 +1,100 @@
-@import './base.css';
+@import "./base.css";
 
 .titlebar {
-	height: 30px;
-	background: whitesmoke;
-	background: linear-gradient(
-		180deg,
-		rgba(245, 245, 245, 1) 0%,
-		rgba(255, 255, 255, 1) 100%
-	);
-	color: black;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	user-select: none;
-	app-region: drag;
-	font-weight: 600;
+  height: 30px;
+  background: whitesmoke;
+  background: linear-gradient(
+    180deg,
+    rgba(245, 245, 245, 1) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  app-region: drag;
+  font-weight: 600;
 }
 
 body {
-	margin: 0;
-	font-family: 'EB Garamond Variable', serif;
+  margin: 0;
+  font-family: "EB Garamond Variable", serif;
 }
 
 #root {
-	height: calc(100vh - 30px);
-	width: 100vw;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
-	overflow: hidden;
+  height: calc(100vh - 30px);
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 button {
-	background: none;
-	background-color: whitesmoke;
-	border: none;
-	padding: 10px;
-	border: 0.5px solid black;
-	font-family: inherit;
-	font-weight: 600;
+  background: none;
+  background-color: whitesmoke;
+  border: none;
+  padding: 10px;
+  border: 0.5px solid black;
+  font-family: inherit;
+  font-weight: 600;
 }
 
 button:has(img) {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	gap: 7px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
 }
 
 #button-container,
 #create-container {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	font-weight: normal;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-weight: normal;
 }
 
 button:hover {
-	cursor: pointer;
-	background-color: #f8f8ff;
+  cursor: pointer;
+  background-color: #f8f8ff;
 }
 
 #save {
-	border-radius: 5px;
-	padding: 5px 10px;
-	position: fixed;
-	right: 20px;
-	bottom: 20px;
+  border-radius: 5px;
+  padding: 5px 10px;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
 }
 
 input {
-	font-family: inherit;
+  font-family: inherit;
 }
 
 .left {
-	border-radius: 10px 0 0 10px;
-	border-right: 1px solid gray;
+  border-radius: 10px 0 0 10px;
+  border-right: 1px solid gray;
 }
 
 .right {
-	border-radius: 0 10px 10px 0;
-	border-left: none;
+  border-radius: 0 10px 10px 0;
+  border-left: none;
 }
 
 .select__control {
-	margin: 10px;
-	width: 300px;
+  margin: 10px;
+  width: 300px;
 }
 
 #create-container button {
-	border-radius: 10px;
+  border-radius: 10px;
 }
 
 #choose-contacts {
-	margin-top: 10px;
+  margin-top: 10px;
 }

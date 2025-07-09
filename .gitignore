@@ -1,6 +1,6 @@
 node_modules
 out
-.DS_Store
 dist
 .eslintcache
 names.txt
+.DS_Store
