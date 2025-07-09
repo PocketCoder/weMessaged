@@ -159,7 +159,7 @@ function Book({
 							<View key={i} style={styles.tocEntry}>
 								<Text style={styles.tocTitle}>{entry.title}</Text>
 								<View style={styles.tocDots} />
-								<Text style={styles.tocPageNumber}>{entry.page}</Text>
+								<Text style={styles.tocPageNumber}>{entry.page + 1}</Text>
 							</View>
 						)
 					)}
