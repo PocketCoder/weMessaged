@@ -67,6 +67,9 @@ button:hover {
 #save {
   border-radius: 5px;
   padding: 5px 10px;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
 }
 
 input {

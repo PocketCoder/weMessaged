@@ -2,10 +2,10 @@ name: Electron CI/CD
 
 on:
   push:
-    branches: ['main']
-    tags: ['v*.*.*']
+    branches: ["main"]
+    tags: ["v*.*.*"]
   pull_request:
-    branches: ['main']
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -27,12 +27,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: latest
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: pnpm install

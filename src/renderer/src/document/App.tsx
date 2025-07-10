@@ -1,6 +1,7 @@
 import { pdf, PDFViewer } from "@react-pdf/renderer";
 import { Message } from "@renderer/lib/types";
 import { useEffect, useState } from "react";
+import save from "../assets/save.svg";
 import Book from "./Book";
 
 function App(): React.JSX.Element {
@@ -34,6 +35,7 @@ function App(): React.JSX.Element {
     <>
       <div>
         <button id="save" onClick={savePDF}>
+          <img src={save} width="32px" height="32px" alt="save" />
           Save
         </button>
       </div>
