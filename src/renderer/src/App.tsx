@@ -14,6 +14,10 @@ function App(): React.JSX.Element {
   const [loading, setLoading] = useState<boolean>(false);
   const [phoneNumbers, setPhoneNumbers] = useState<ContactOption[]>([]);
   const [selectedContacts, setSelectedContacts] = useState<ContactOption[]>([]);
+  const [title, setTitle] = useState<string>('');
+  const [acknowledgements, setAcknowledgements] = useState<string>('');
+  const [yourName, setYourName] = useState<string>('');
+  const [theirName, setTheirName] = useState<string>('');
 
   async function findDefault(): Promise<boolean> {
     return await window.electron.ipcRenderer.invoke("find-default");
@@ -51,9 +55,9 @@ function App(): React.JSX.Element {
       await window.electron.ipcRenderer.invoke(
         "generate-pdf",
         {
-          authors: ["Test1", "Test2"],
-          title: "Test title",
-          acknowledgements: "Test Acknowledgements.",
+          authors: [yourName, theirName],
+          title: title,
+          acknowledgements: acknowledgements,
         },
         result.messages,
       );
@@ -94,6 +98,7 @@ function App(): React.JSX.Element {
       {phoneNumbers.length === 0 ? (
         <></>
       ) : (
+        <>
         <div id="choose-contacts">
           <span>2. Choose the contacts to include in your book...</span>
           <div id="create-container">
@@ -106,12 +111,20 @@ function App(): React.JSX.Element {
                 setSelectedContacts(selected as ContactOption[])
               }
             />
-            <button onClick={handleCreateClick}>
-              Create
-              <img src={write} width={"21px"} height={"21px"} alt="Pen" />
-            </button>
           </div>
         </div>
+        <div id="collect-meta">
+          <span>3. Add in some details...</span>
+          <input placeholder="Book title" onChange={e => setTitle(e.target.value)}/>
+          <input placeholder="Acknowledgements" onChange={e => setAcknowledgements(e.target.value)}/>
+          <input placeholder="Their name" onChange={e => setTheirName(e.target.value)}/>
+          <input placeholder="Your name" onChange={e => setYourName(e.target.value)}/>
+        </div>
+        <button onClick={handleCreateClick}>
+              Create
+              <img src={write} width={"21px"} height={"21px"} alt="Pen" />
+          </button>
+        </>
       )}
       {loading ? <span>Loading...</span> : <></>}
     </>
