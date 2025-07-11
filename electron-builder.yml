@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: electron-imessage-book
+productName: weMessaged
 directories:
   buildResources: build
 files:
@@ -13,7 +13,7 @@ asarUnpack:
   - resources/**
 win:
   icon: build/icon.png
-  executableName: electron-imessage-book
+  executableName: weMessaged
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

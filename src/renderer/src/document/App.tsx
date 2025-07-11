@@ -9,7 +9,7 @@ function App(): React.JSX.Element {
     authors: string;
     title: string;
     acknowledgements: string;
-  }>({ authors: "", title: "iMessage Book", acknowledgements: "" });
+  }>({ authors: "", title: "weMessaged Book", acknowledgements: "" });
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {

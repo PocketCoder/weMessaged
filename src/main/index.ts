@@ -119,7 +119,7 @@ ipcMain.handle(
 ipcMain.handle("save-pdf", (_, data: Uint8Array) => {
   const saveLoc = dialog.showSaveDialogSync({
     properties: ["createDirectory"],
-    defaultPath: "iMessage-book.pdf",
+    defaultPath: "weMessaged-book.pdf",
   });
 
   if (saveLoc) {

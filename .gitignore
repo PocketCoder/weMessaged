@@ -2,5 +2,4 @@ node_modules
 out
 dist
 .eslintcache
-names.txt
 .DS_Store
