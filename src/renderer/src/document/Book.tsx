@@ -204,9 +204,12 @@ function Book({
 											'Attachment'
 										:	message.message_text}
 									</Text>
-									<Text style={[styles.dateText]}>
-										{new Date(message.converted_date as string).toDateString()}
-									</Text>
+									<Text style={[styles.dateText]} render={() => {
+										const fullDate: Date = new Date(message.converted_date as string);
+										const date: string = fullDate.getDate() + '/' + (fullDate.getMonth() + 1) + '/' + fullDate.getFullYear();
+										const time: string = fullDate.getHours() + ':' + fullDate.getMinutes();
+										return `${date} \u2022 ${time}`;
+									}} />
 								</View>
 							))}
 						</View>
