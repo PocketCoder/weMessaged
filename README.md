@@ -1,7 +1,9 @@
 # weMessaged
+
 An Electron application based on [message-book](https://github.com/bkettle/message-book) by [Ben Kettle](https://github.com/bkettle).
 
 ## A thank you to...
+
 - [Ben Kettle](https://github.com/bkettle) for the idea and base SQL.
 - [These icons](https://www.figma.com/design/ne1weVy1Udej9RwnYUqlyD/1-300-Free-Pixel-Icons-–-Vector-Pixel-icons--svg---Community)
 

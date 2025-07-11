@@ -7,6 +7,5 @@
 	"singleAttributePerLine": false,
 	"singleQuote": true,
 	"useTabs": true,
-	"trailingComma": "none",
-  	"plugins": ["prettier-plugin-tailwindcss"]
+	"trailingComma": "none"
 }
