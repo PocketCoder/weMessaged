@@ -70,6 +70,14 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
+	copyrightPage: {
+		textAlign: 'center',
+		fontSize: 10,
+		fontFamily: 'Literata',
+		flexDirection: 'column',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
 	monthPage: {},
 	monthPageTitle: {
 		fontSize: 18,
@@ -78,7 +86,8 @@ const styles = StyleSheet.create({
 		paddingBottom: 80,
 	},
 	dateText: {
-		fontSize: 8,
+		paddingTop: 3,
+		fontSize: 7,
 	},
 	message: {
 		fontFamily: 'SanFrancisco',
@@ -109,6 +118,10 @@ const styles = StyleSheet.create({
 	},
 	tocTitle: {
 		fontSize: 11,
+	},
+	tocPageTitle: {
+		paddingTop: 5,
+		paddingBottom: 10,
 	},
 	tocDots: {
 		flexGrow: 1,
@@ -144,8 +157,18 @@ function Book({
 	return (
 		<Document title={data.title}>
 			<Page size="A5" style={[styles.page, styles.titlePage]}>
-				<View>
+				<View style={styles.titlePage}>
 					<Text>{data.title}</Text>
+					<Text style={[styles.authors]}>{`${data.authors[0]}, ${data.authors[1]}`}</Text>
+				</View>
+			</Page>
+			<Page size="A5"></Page>
+			<Page size="A5" style={[styles.page, styles.copyrightPage]}>
+				<View>
+					<Text>
+						&copy; {new Date().getFullYear()} {data.authors.join(', ')}
+					</Text>
+					<Text>All Rights Reserved.</Text>
 				</View>
 			</Page>
 			<Page size="A5"></Page>
@@ -157,7 +180,7 @@ function Book({
 			<Page size="A5"></Page>
 			<Page size="A5" style={[styles.page]}>
 				<View>
-					<Text>Table of Contents</Text>
+					<Text style={[styles.tocPageTitle]}>Table of Contents</Text>
 					{ToC.sort((a, b) => a.page - b.page).map(
 						(entry: { title: string; page: number }, i: number) => (
 							<View key={i} style={styles.tocEntry}>
