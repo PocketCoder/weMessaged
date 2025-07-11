@@ -4,7 +4,7 @@
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "110399.xyz",
-  "homepage": "https://github.com/PocketCoder/electron-imessage-book",
+  "homepage": "https://github.com/PocketCoder/weMessaged",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
