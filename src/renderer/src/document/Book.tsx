@@ -57,6 +57,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
+	authors: {
+		fontSize: 10,
+		fontStyle: 'italic'
+	},
 	acknowledgementsPage: {
 		textAlign: 'center',
 		fontSize: 12,
@@ -123,7 +127,7 @@ function Book({
 	data,
 	messages,
 }: {
-	data: { authors: string; title: string; acknowledgements: string };
+	data: { authors: string[]; title: string; acknowledgements: string };
 	messages: Message[];
 }): React.ReactElement {
 	const grouped = groupMessagesByMonth(messages);
@@ -138,7 +142,7 @@ function Book({
 	}
 
 	return (
-		<Document title={data.title} author={data.authors} creator={data.authors}>
+		<Document title={data.title}>
 			<Page size="A5" style={[styles.page, styles.titlePage]}>
 				<View>
 					<Text>{data.title}</Text>

@@ -6,10 +6,10 @@ import Book from "./Book";
 
 function App(): React.JSX.Element {
   const [metadata, setMetadata] = useState<{
-    authors: string;
+    authors: string[];
     title: string;
     acknowledgements: string;
-  }>({ authors: "", title: "weMessaged Book", acknowledgements: "" });
+  }>({ authors: [], title: "weMessaged Book", acknowledgements: "" });
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {

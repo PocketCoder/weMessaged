@@ -85,7 +85,7 @@ ipcMain.handle(
   "generate-pdf",
   (
     _,
-    data: { authors: string; title: string; acknowledgements: string },
+    data: { authors: string[]; title: string; acknowledgements: string },
     messages: Message[],
   ) => {
     const previewWindow = new BrowserWindow({

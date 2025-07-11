@@ -51,7 +51,7 @@ function App(): React.JSX.Element {
       await window.electron.ipcRenderer.invoke(
         "generate-pdf",
         {
-          authors: "Jake",
+          authors: ["Test1", "Test2"],
           title: "Test title",
           acknowledgements: "Test Acknowledgements.",
         },

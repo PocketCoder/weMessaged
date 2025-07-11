@@ -10,7 +10,7 @@ const api = {
   getMessages: (contacts: string[]) =>
     ipcRenderer.invoke("get-messages", contacts),
   generatePDF: (
-    data: { authors: string; title: string; acknowledgements: string },
+    data: { authors: string[]; title: string; acknowledgements: string },
     messages: Message[],
   ) => ipcRenderer.invoke("generate-pdf", data, messages),
   savePDF: (buffer: Uint8Array) => ipcRenderer.invoke("save-pdf", buffer),
