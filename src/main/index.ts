@@ -42,13 +42,18 @@ ipcMain.handle('get-messages', (_, contacts: string[]): {success: boolean; messa
 					m.text             AS message_text,
 					m.date             AS apple_date_int,
 					m.date_read        AS date_read_int,
-					m.date_delivered   AS date_delivered_int
+					m.date_delivered   AS date_delivered_int,
+					a.filename         AS attachment_path
 				FROM
 					message AS m
 				JOIN
 					chat_message_join AS cmj ON m.ROWID = cmj.message_id
 				JOIN
 					chat AS c ON cmj.chat_id = c.ROWID
+				LEFT JOIN
+					message_attachment_join AS maj ON m.ROWID = maj.message_id
+				LEFT JOIN
+					attachment AS a ON maj.attachment_id = a.ROWID
 				WHERE
 					c.chat_identifier IN (${placeholders})
 				ORDER BY
@@ -56,9 +61,11 @@ ipcMain.handle('get-messages', (_, contacts: string[]): {success: boolean; messa
 			`;
 		const stmt = db.prepare(sql);
 		const messages = stmt.all(...contacts) as Message[];
+		const homeDir = os.homedir();
 		const newMessages = messages.map((m) => ({
 			...m,
-			converted_date: convertAppleDateInt(m.apple_date_int)
+			converted_date: convertAppleDateInt(m.apple_date_int),
+			attachment_path: m.attachment_path ? m.attachment_path.replace('~', homeDir) : null
 		}));
 		return {success: true, messages: newMessages};
 	} catch (err: unknown) {
