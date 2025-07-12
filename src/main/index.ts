@@ -7,8 +7,8 @@ import Database, {Database as DatabaseType} from 'better-sqlite3';
 import {Message} from '../renderer/src/lib/types';
 import {electronApp, optimizer, is} from '@electron-toolkit/utils';
 import {askForFullDiskAccess, getAuthStatus} from 'node-mac-permissions';
-
 import {convertAppleDateInt} from '../renderer/src/lib/utils';
+import {fileTypeFromFile} from 'file-type';
 
 let db: DatabaseType;
 
@@ -28,13 +28,15 @@ ipcMain.handle('get-contacts', (): {success: boolean; contacts?: {id: string}[];
 	}
 });
 
-ipcMain.handle('get-messages', (_, contacts: string[]): {success: boolean; messages?: Message[]; error?: unknown} => {
-	const placeholders = contacts.map(() => '?').join(',');
-	try {
-		if (contacts.length === 0) {
-			return {success: false, error: 'No contacts in array'};
-		}
-		const sql = `
+ipcMain.handle(
+	'get-messages',
+	async (_, contacts: string[]): Promise<{success: boolean; messages?: Message[]; error?: unknown}> => {
+		const placeholders = contacts.map(() => '?').join(',');
+		try {
+			if (contacts.length === 0) {
+				return {success: false, error: 'No contacts in array'};
+			}
+			const sql = `
 				SELECT
 					m.ROWID            AS message_id,
 					c.chat_identifier  AS other_party,
@@ -59,20 +61,54 @@ ipcMain.handle('get-messages', (_, contacts: string[]): {success: boolean; messa
 				ORDER BY
 					m.date;
 			`;
-		const stmt = db.prepare(sql);
-		const messages = stmt.all(...contacts) as Message[];
-		const homeDir = os.homedir();
-		const newMessages = messages.map((m) => ({
-			...m,
-			converted_date: convertAppleDateInt(m.apple_date_int),
-			attachment_path: m.attachment_path ? m.attachment_path.replace('~', homeDir) : null
-		}));
-		return {success: true, messages: newMessages};
-	} catch (err: unknown) {
-		console.log(err);
-		return {success: false, error: (err as Error).message};
+			const stmt = db.prepare(sql);
+			const messages = stmt.all(...contacts) as Message[];
+			const homeDir = os.homedir();
+			const newMessages: Message[] = await Promise.all(
+				messages.map(async (m) => {
+					const attachmentPath = m.attachment_path ? m.attachment_path.replace('~', homeDir) : null;
+					const attachmentURI = attachmentPath ? await attachmentToURI(attachmentPath) : '';
+					return {
+						...m,
+						converted_date: convertAppleDateInt(m.apple_date_int),
+						attachment_path: attachmentPath,
+						attachment_uri: attachmentURI
+					};
+				})
+			);
+			return {success: true, messages: newMessages};
+		} catch (err: unknown) {
+			console.log(err);
+			return {success: false, error: (err as Error).message};
+		}
 	}
-});
+);
+
+async function attachmentToURI(path: string): Promise<string> {
+	const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
+	if (fs.existsSync(path)) {
+		try {
+			const stats = fs.statSync(path);
+			if (stats.size > MAX_FILE_SIZE_BYTES) {
+				console.log(`Skipping attachment as it is too large: ${path}`);
+				return '';
+			}
+			const fileDetails = await fileTypeFromFile(path);
+			if (!fileDetails || !fileDetails.mime.startsWith('image/')) {
+				console.log(`Skipping attachment as it is not an image: ${path}`);
+				return '';
+			}
+
+			const fileBuffer = fs.readFileSync(path);
+			return `data:${fileDetails.mime};base64,${fileBuffer.toString('base64')}`;
+		} catch (e) {
+			console.error(`Failed to read attachment: ${path}`, e);
+			return '';
+		}
+	} else {
+		return '';
+	}
+}
 
 ipcMain.handle(
 	'generate-pdf',

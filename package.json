@@ -36,6 +36,7 @@
 		"@react-pdf/renderer": "^4.3.0",
 		"better-sqlite3": "^11.10.0",
 		"clsx": "^2.1.1",
+		"file-type": "^21.0.0",
 		"node-mac-permissions": "^2.5.0",
 		"react-select": "^5.10.1"
 	},

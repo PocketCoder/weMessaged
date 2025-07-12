@@ -8,4 +8,5 @@ export interface Message {
 	date_delivered_int: number | null; // Timestamp when the message was delivered (nullable)
 	converted_date?: string;
 	attachment_path?: string | null; // Path to the attachment, if one exists
+	attachment_uri?: string | null;
 }

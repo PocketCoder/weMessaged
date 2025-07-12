@@ -1,4 +1,4 @@
-import {Page, Text, View, Document, StyleSheet, Font} from '@react-pdf/renderer';
+import {Page, Text, View, Document, StyleSheet, Font, Image} from '@react-pdf/renderer';
 import {useState} from 'react';
 import {Message} from '@renderer/lib/types';
 
@@ -210,7 +210,11 @@ function Book({
 										message.message_text.includes('\ufffc') ? styles.attachment : {}
 									]}
 									minPresenceAhead={100}>
-									<Text>{message.message_text.includes('\ufffc') ? 'Attachment' : message.message_text}</Text>
+									{message.attachment_uri ? (
+										<Image src={message.attachment_uri} />
+									) : (
+										<Text>{message.message_text.includes('\ufffc') ? 'Attachment' : message.message_text}</Text>
+									)}
 									<Text
 										style={[styles.dateText]}
 										render={() => {
