@@ -9,6 +9,7 @@ import {electronApp, optimizer, is} from '@electron-toolkit/utils';
 import {askForFullDiskAccess, getAuthStatus} from 'node-mac-permissions';
 import {convertAppleDateInt} from '../renderer/src/lib/utils';
 import {fileTypeFromFile} from 'file-type';
+import heicConvert from 'heic-convert';
 
 let db: DatabaseType;
 
@@ -99,12 +100,17 @@ async function attachmentToURI(path: string): Promise<string> {
 				return '';
 			}
 
+			const fileBuffer = fs.readFileSync(path);
+
 			if (!fileDetails || fileDetails.mime.endsWith('/heic')) {
-				console.log(`Skipping attachment as it is heic and not supported: ${path}`);
-				return '';
+				console.log(`Converting HEIC: ${path}`);
+				const outputBuffer = await heicConvert({
+					buffer: fileBuffer,
+					format: 'PNG'
+				});
+				return `data:image/png;base64,${outputBuffer.toString('base64')}`;
 			}
 
-			const fileBuffer = fs.readFileSync(path);
 			return `data:${fileDetails.mime};base64,${fileBuffer.toString('base64')}`;
 		} catch (e) {
 			console.error(`Failed to read attachment: ${path}`, e);
