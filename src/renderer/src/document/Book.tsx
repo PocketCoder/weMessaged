@@ -91,6 +91,10 @@ const styles = StyleSheet.create({
 		fontFamily: 'Courier',
 		fontStyle: 'italic'
 	},
+	attachmentImg: {
+		width: '30vw',
+		alignSelf: 'flex-end'
+	},
 	meText: {
 		textAlign: 'right'
 	},
@@ -204,16 +208,16 @@ function Book({
 								<View
 									key={j}
 									wrap={false}
-									style={[
-										styles.message,
-										message.from_me_flag ? styles.meText : styles.themText,
-										message.message_text.includes('\ufffc') ? styles.attachment : {}
-									]}
+									style={[styles.message, message.from_me_flag ? styles.meText : styles.themText]}
 									minPresenceAhead={100}>
 									{message.attachment_uri ? (
-										<Image src={message.attachment_uri} />
+										<Image src={message.attachment_uri!} style={[styles.attachmentImg]} />
+									) : message.attachment_path?.includes('.caf') ? (
+										<Text>Audio Message</Text>
+									) : message.attachment_path?.includes('.MOV') || message.attachment_path?.includes('.mp4') ? (
+										<Text>Video</Text>
 									) : (
-										<Text>{message.message_text.includes('\ufffc') ? 'Attachment' : message.message_text}</Text>
+										<Text>{message.message_text}</Text>
 									)}
 									<Text
 										style={[styles.dateText]}
