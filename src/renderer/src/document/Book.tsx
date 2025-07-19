@@ -215,9 +215,9 @@ function Book({
 									) : message.attachment_path?.includes('.caf') ? (
 										<Text>Audio Message</Text>
 									) : message.attachment_path?.includes('.MOV') || message.attachment_path?.includes('.mp4') ? (
-										<Text>Video</Text>
+										<Text>Video Message</Text>
 									) : (
-										<Text>{message.message_text}</Text>
+										<Text>{message.message_text.replaceAll(`\uFFFC`, '')}</Text>
 									)}
 									<Text
 										style={[styles.dateText]}

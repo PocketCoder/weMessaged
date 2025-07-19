@@ -99,6 +99,11 @@ async function attachmentToURI(path: string): Promise<string> {
 				return '';
 			}
 
+			if (!fileDetails || fileDetails.mime.endsWith('/heic')) {
+				console.log(`Skipping attachment as it is heic and not supported: ${path}`);
+				return '';
+			}
+
 			const fileBuffer = fs.readFileSync(path);
 			return `data:${fileDetails.mime};base64,${fileBuffer.toString('base64')}`;
 		} catch (e) {
