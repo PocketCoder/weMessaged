@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: Electron CI/CD
 
 on:
@@ -72,3 +73,5 @@ jobs:
             release-artifacts/*
           draft: true
           token: ${{ secrets.GH_TOKEN }}
+=======
+>>>>>>> 75de8c1 (.)
