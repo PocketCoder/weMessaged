@@ -151,6 +151,8 @@ function Book({
 		});
 	}
 
+	console.log(grouped);
+
 	return (
 		<Document title={data.title}>
 			<Page size="A5" style={[styles.page, styles.titlePage]}>
