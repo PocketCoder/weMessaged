@@ -1,15 +1,13 @@
 import {app, shell, BrowserWindow, ipcMain, dialog} from 'electron';
 import os from 'os';
-import fs from 'fs';
+import fs, {existsSync} from 'fs';
 import {join} from 'path';
-import {existsSync} from 'fs';
 import Database, {Database as DatabaseType} from 'better-sqlite3';
 import {Message} from '../renderer/src/lib/types';
 import {electronApp, optimizer, is} from '@electron-toolkit/utils';
 import {askForFullDiskAccess, getAuthStatus} from 'node-mac-permissions';
 import {convertAppleDateInt} from '../renderer/src/lib/utils';
-import {fileTypeFromFile} from 'file-type';
-import heicConvert from 'heic-convert';
+import {Worker} from 'worker_threads';
 
 let db: DatabaseType;
 
@@ -67,14 +65,58 @@ ipcMain.handle(
 			const homeDir = os.homedir();
 			const newMessages: Message[] = await Promise.all(
 				messages.map(async (m) => {
-					const attachmentPath = m.attachment_path ? m.attachment_path.replace('~', homeDir) : null;
-					const attachmentURI = attachmentPath ? await attachmentToURI(attachmentPath) : '';
-					return {
-						...m,
-						converted_date: convertAppleDateInt(m.apple_date_int),
-						attachment_path: attachmentPath,
-						attachment_uri: attachmentURI
-					};
+					const originalAttachmentPath = m.attachment_path ? m.attachment_path.replace('~', homeDir) : null;
+					return new Promise((resolve) => {
+						if (!originalAttachmentPath || !existsSync(originalAttachmentPath)) {
+							resolve({
+								...m,
+								converted_date: convertAppleDateInt(m.apple_date_int),
+								attachment_path: null,
+								attachment_uri: null
+							});
+							return;
+						}
+
+						const worker = new Worker(join(__dirname, 'attachment.worker.js'));
+						let terminated = false;
+
+						function resolveAndTerminate(uri: string | null): void {
+							if (terminated) return;
+							terminated = true;
+							resolve({
+								...m,
+								converted_date: convertAppleDateInt(m.apple_date_int),
+								attachment_path: originalAttachmentPath,
+								attachment_uri: uri
+							});
+							worker.terminate();
+						}
+
+						worker.on('message', (uri: string | null) => {
+							resolveAndTerminate(uri);
+						});
+
+						worker.on('error', (err) => {
+							console.error(`Error processing attachment ${originalAttachmentPath} in worker:`, err);
+							resolveAndTerminate(null);
+						});
+
+						worker.on('exit', (code) => {
+							if (code !== 0 && !terminated) {
+								console.error(`Worker for ${originalAttachmentPath} stopped with exit code ${code}`);
+								resolve({
+									...m,
+									converted_date: convertAppleDateInt(m.apple_date_int),
+									attachment_path: null,
+									attachment_uri: null
+								});
+							}
+						});
+						worker.postMessage({
+							attachmentPath: originalAttachmentPath,
+							sessionDataPath: app.getPath('sessionData')
+						});
+					});
 				})
 			);
 			return {success: true, messages: newMessages};
@@ -84,42 +126,6 @@ ipcMain.handle(
 		}
 	}
 );
-
-async function attachmentToURI(path: string): Promise<string> {
-	const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
-	if (fs.existsSync(path)) {
-		try {
-			const stats = fs.statSync(path);
-			if (stats.size > MAX_FILE_SIZE_BYTES) {
-				console.log(`Skipping attachment as it is too large: ${path}`);
-				return '';
-			}
-			const fileDetails = await fileTypeFromFile(path);
-			if (!fileDetails || !fileDetails.mime.startsWith('image/')) {
-				console.log(`Skipping attachment as it is not an image: ${path}`);
-				return '';
-			}
-
-			const fileBuffer = fs.readFileSync(path);
-
-			if (!fileDetails || fileDetails.mime.endsWith('/heic')) {
-				console.log(`Converting HEIC: ${path}`);
-				const outputBuffer = await heicConvert({
-					buffer: fileBuffer,
-					format: 'PNG'
-				});
-				return `data:image/png;base64,${outputBuffer.toString('base64')}`;
-			}
-
-			return `data:${fileDetails.mime};base64,${fileBuffer.toString('base64')}`;
-		} catch (e) {
-			console.error(`Failed to read attachment: ${path}`, e);
-			return '';
-		}
-	} else {
-		return '';
-	}
-}
 
 ipcMain.handle(
 	'generate-pdf',
@@ -133,9 +139,7 @@ ipcMain.handle(
 			autoHideMenuBar: true,
 			webPreferences: {
 				preload: join(__dirname, '../preload/index.js'),
-				sandbox: false,
-				nodeIntegration: true,
-				contextIsolation: false
+				sandbox: false
 			}
 		});
 		previewWindow.on('ready-to-show', () => previewWindow.show());

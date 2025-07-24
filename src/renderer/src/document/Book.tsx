@@ -1,5 +1,5 @@
 import {Page, Text, View, Document, StyleSheet, Font, Image} from '@react-pdf/renderer';
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import {Message} from '@renderer/lib/types';
 
 function groupMessagesByMonth(messages: Message[]): Record<string, Message[]> {
@@ -144,12 +144,12 @@ function Book({
 
 	const [ToC, setToC] = useState<{title: string; page: number}[]>([]);
 
-	function addEntry(title: string, page: number): void {
+	const addEntry = useCallback((title: string, page: number) => {
 		setToC((prevToC) => {
 			if (prevToC.find((entry) => entry.title === title)) return prevToC;
 			return [...prevToC, {title, page}];
 		});
-	}
+	}, []);
 
 	console.log(grouped);
 
@@ -213,7 +213,10 @@ function Book({
 									style={[styles.message, message.from_me_flag ? styles.meText : styles.themText]}
 									minPresenceAhead={100}>
 									{message.attachment_uri ? (
-										<Image src={message.attachment_uri!} style={[styles.attachmentImg]} />
+										<>
+											<Image src={message.attachment_uri} style={[styles.attachmentImg]} />
+											<Text>{message.message_text.replaceAll(`\uFFFC`, '')}</Text>
+										</>
 									) : message.attachment_path?.includes('.caf') ? (
 										<Text>Audio Message</Text>
 									) : message.attachment_path?.includes('.MOV') || message.attachment_path?.includes('.mp4') ? (
