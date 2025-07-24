@@ -23,7 +23,7 @@ async function processAttachment({attachmentPath, sessionDataPath}: WorkerData):
 		if (fileType?.ext == 'heic') {
 			const inputBuffer = fs.readFileSync(attachmentPath);
 			const outputBuffer = await heicConvert({
-				buffer: inputBuffer,
+				buffer: inputBuffer as any,
 				format: 'PNG'
 			});
 			uri = `data:image/png;base64,${Buffer.from(outputBuffer).toString('base64')}`;
