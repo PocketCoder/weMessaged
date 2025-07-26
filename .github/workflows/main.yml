@@ -67,10 +67,20 @@ jobs:
           name: dist-macos-latest
           path: release-artifacts
 
+      - name: Generate Changelog
+        uses: mikepenz/release-changelog-generator@v1
+        id: changelog
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fromTag: ${{ github.event.repository.default_branch }}
+          toTag: ${{ github.ref }}
+          outputFile: CHANGELOG.md
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             release-artifacts/**/*
-          draft: true
+          draft: false
           token: ${{ secrets.GH_TOKEN }}
+          body_path: CHANGELOG.md
