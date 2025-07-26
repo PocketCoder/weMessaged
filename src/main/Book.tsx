@@ -1,10 +1,8 @@
 import {Page, Text, View, Document, StyleSheet, Font, Image} from '@react-pdf/renderer';
 //import {useCallback, useState} from 'react';
 import {Message} from '../renderer/src/lib/types';
-
-import LiterataRegular from '../../resources/Literata/static/Literata-Regular.ttf?asset';
-import LiterataItalic from '../../resources/Literata/static/Literata-Italic.ttf?asset';
-import SanFrancisco from '../../resources/SFUIText-Regular.otf?asset';
+import EBGaramondRegular from '../../resources/EB_Garamond/static/EBGaramond-Regular.ttf?asset';
+import EBGaramondItalic from '../../resources/EB_Garamond/static/EBGaramond-Italic.ttf?asset';
 
 function groupMessagesByMonth(messages: Message[]): Record<string, Message[]> {
 	const grouped: Record<string, Message[]> = {};
@@ -18,22 +16,11 @@ function groupMessagesByMonth(messages: Message[]): Record<string, Message[]> {
 }
 
 Font.register({
-	family: 'Literata',
-	src: LiterataRegular
-});
-
-Font.register({
-	family: 'Literata',
-	src: LiterataItalic,
-	fontStyle: 'italic',
-	fontWeight: 400
-});
-
-Font.register({
-	family: 'SanFrancisco',
-	src: SanFrancisco,
-	fontStyle: 'normal',
-	fontWeight: 'normal'
+	family: 'EB Garamond',
+	fonts: [
+		{src: EBGaramondRegular, fontStyle: 'normal'},
+		{src: EBGaramondItalic, fontStyle: 'italic'}
+	]
 });
 
 Font.registerEmojiSource({
@@ -43,13 +30,12 @@ Font.registerEmojiSource({
 
 const styles = StyleSheet.create({
 	page: {
-		fontFamily: 'Literata',
+		fontFamily: 'EB Garamond',
 		padding: 50
 	},
 	titlePage: {
 		textAlign: 'center',
 		fontSize: 12,
-		fontFamily: 'Literata',
 		flexDirection: 'column',
 		justifyContent: 'center',
 		alignItems: 'center'
@@ -61,7 +47,6 @@ const styles = StyleSheet.create({
 	acknowledgementsPage: {
 		textAlign: 'center',
 		fontSize: 12,
-		fontFamily: 'Literata',
 		fontStyle: 'italic',
 		flexDirection: 'column',
 		justifyContent: 'center',
@@ -70,7 +55,6 @@ const styles = StyleSheet.create({
 	copyrightPage: {
 		textAlign: 'center',
 		fontSize: 10,
-		fontFamily: 'Literata',
 		flexDirection: 'column',
 		justifyContent: 'center',
 		alignItems: 'center'
@@ -87,7 +71,6 @@ const styles = StyleSheet.create({
 		fontSize: 7
 	},
 	message: {
-		fontFamily: 'SanFrancisco',
 		paddingVertical: 20,
 		fontSize: 11
 	},
