@@ -1,5 +1,4 @@
 import {Page, Text, View, Document, StyleSheet, Font, Image} from '@react-pdf/renderer';
-//import {useCallback, useState} from 'react';
 import {Message} from '../renderer/src/lib/types';
 import EBGaramondRegular from '../../resources/EB_Garamond/static/EBGaramond-Regular.ttf?asset';
 import EBGaramondItalic from '../../resources/EB_Garamond/static/EBGaramond-Italic.ttf?asset';
@@ -62,9 +61,7 @@ const styles = StyleSheet.create({
 	monthPage: {},
 	monthPageTitle: {
 		fontSize: 18,
-		textAlign: 'center',
-		paddingTop: 60,
-		paddingBottom: 80
+		textAlign: 'center'
 	},
 	dateText: {
 		paddingTop: 3,
@@ -128,16 +125,14 @@ function Book({
 	messages: Message[];
 }): React.ReactElement {
 	const grouped = groupMessagesByMonth(messages);
-	/*
-	const [ToC, setToC] = useState<{title: string; page: number}[]>([]);
 
-	const addEntry = useCallback((title: string, page: number) => {
-		setToC((prevToC) => {
-			if (prevToC.find((entry) => entry.title === title)) return prevToC;
-			return [...prevToC, {title, page}];
-		});
-	}, []);
-*/
+	const ToC: {title: string; page: number}[] = [];
+
+	const addEntry = (title, page): {title: string; page: number}[] => {
+		if (ToC.find((entry) => entry.title === title)) return ToC;
+		return [...ToC, {title, page}];
+	};
+
 	//console.log(grouped);
 
 	return (
@@ -152,7 +147,7 @@ function Book({
 			<Page size="A5" style={[styles.page, styles.copyrightPage]}>
 				<View>
 					<Text>
-						&copy; {new Date().getFullYear()} {data.authors.join(', ')}
+						© {new Date().getFullYear()} {data.authors.join(', ')}
 					</Text>
 					<Text>All Rights Reserved.</Text>
 				</View>
@@ -161,19 +156,20 @@ function Book({
 			<Page size="A5" style={[styles.page, styles.acknowledgementsPage]}>
 				<View>
 					<Text>{data.acknowledgements}</Text>
+					<Text>— {data.authors[0]}</Text>
 				</View>
 			</Page>
 			<Page size="A5"></Page>
 			<Page size="A5" style={[styles.page]}>
 				<View>
 					<Text style={[styles.tocPageTitle]}>Table of Contents</Text>
-					{/*ToC.sort((a, b) => a.page - b.page).map((entry: {title: string; page: number}, i: number) => (
+					{ToC.sort((a, b) => a.page - b.page).map((entry: {title: string; page: number}, i: number) => (
 						<View key={i} style={styles.tocEntry}>
 							<Text style={styles.tocTitle}>{entry.title}</Text>
 							<View style={styles.tocDots} />
 							<Text style={styles.tocPageNumber}>{entry.page + 1}</Text>
 						</View>
-					))*/}
+					))}
 				</View>
 			</Page>
 			{Object.keys(grouped)
@@ -183,20 +179,29 @@ function Book({
 						<Text fixed render={({pageNumber}) => pageNumber} style={styles.pageNumber} />
 						<View>
 							<Text
-								style={[styles.monthPageTitle]}
-								render={() =>
-									/*{
-										pageNumber
-									}*/
+								style={[
+									styles.monthPageTitle,
 									{
-										const title = new Intl.DateTimeFormat('en-GB', {
-											year: 'numeric',
-											month: 'long'
-										}).format(new Date(month));
-										//addEntry(title, pageNumber);
-										return title;
+										paddingTop: 50,
+										paddingBottom: 5,
+										borderBottomWidth: '0.5',
+										borderBottomColor: 'black',
+										width: 40,
+										marginHorizontal: 'auto'
 									}
-								}
+								]}>
+								{i + 1}
+							</Text>
+							<Text
+								style={[styles.monthPageTitle, {paddingBottom: 50, paddingTop: 10}]}
+								render={({pageNumber}) => {
+									const title = new Intl.DateTimeFormat('en-GB', {
+										year: 'numeric',
+										month: 'long'
+									}).format(new Date(month));
+									addEntry(title, pageNumber);
+									return title;
+								}}
 							/>
 							{grouped[month].map((message, j) => (
 								<View
