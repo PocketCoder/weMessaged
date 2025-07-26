@@ -8,6 +8,8 @@ import {electronApp, optimizer, is} from '@electron-toolkit/utils';
 import {askForFullDiskAccess, getAuthStatus} from 'node-mac-permissions';
 import {convertAppleDateInt} from '../renderer/src/lib/utils';
 import {Worker} from 'worker_threads';
+import Book from './Book';
+import {renderToFile} from '@react-pdf/renderer';
 
 let db: DatabaseType;
 
@@ -80,20 +82,20 @@ ipcMain.handle(
 						const worker = new Worker(join(__dirname, 'attachment.worker.js'));
 						let terminated = false;
 
-						function resolveAndTerminate(newPath: string | null): void {
+						function resolveAndTerminate(newUri: string | null): void {
 							if (terminated) return;
 							terminated = true;
 							resolve({
 								...m,
 								converted_date: convertAppleDateInt(m.apple_date_int),
 								attachment_path: originalAttachmentPath,
-								new_attachment_path: newPath
+								attachment_uri: newUri
 							});
 							worker.terminate();
 						}
 
-						worker.on('message', (newPath: string | null) => {
-							resolveAndTerminate(newPath);
+						worker.on('message', (newUri: string | null) => {
+							resolveAndTerminate(newUri);
 						});
 
 						worker.on('error', (err) => {
@@ -108,14 +110,12 @@ ipcMain.handle(
 									...m,
 									converted_date: convertAppleDateInt(m.apple_date_int),
 									attachment_path: null,
-									attachment_uri: null,
-									new_attachment_path: null
+									attachment_uri: null
 								});
 							}
 						});
 						worker.postMessage({
-							attachmentPath: originalAttachmentPath,
-							sessionDataPath: app.getPath('sessionData')
+							attachmentPath: originalAttachmentPath
 						});
 					});
 				})
@@ -130,28 +130,20 @@ ipcMain.handle(
 
 ipcMain.handle(
 	'generate-pdf',
-	(_, data: {authors: string[]; title: string; acknowledgements: string}, messages: Message[]) => {
-		const previewWindow = new BrowserWindow({
-			titleBarStyle: 'hidden',
-			...(process.platform !== 'darwin' ? {titleBarOverlay: true} : {}),
-			width: 900,
-			height: 670,
-			show: false,
-			autoHideMenuBar: true,
-			webPreferences: {
-				preload: join(__dirname, '../preload/index.js'),
-				sandbox: false
+	async (_, data: {authors: string[]; title: string; acknowledgements: string}, pdfMessages: Message[]) => {
+		const saveLoc = dialog.showSaveDialogSync({
+			properties: ['createDirectory'],
+			defaultPath: 'weMessaged-book.pdf'
+		});
+
+		if (saveLoc) {
+			try {
+				await renderToFile(<Book data={data} messages={pdfMessages} />, `${saveLoc}`);
+			} catch (e: unknown) {
+				dialog.showErrorBox('Error saving file', (e as Error).message);
+				console.error(e);
 			}
-		});
-		previewWindow.on('ready-to-show', () => previewWindow.show());
-		if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-			previewWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/src/document/book.html`);
-		} else {
-			previewWindow.loadFile(join(__dirname, '../renderer/book.html'));
 		}
-		previewWindow.webContents.on('did-finish-load', () => {
-			previewWindow.webContents.send('pdf-data', data, messages);
-		});
 	}
 );
 

@@ -1,6 +1,10 @@
 import {Page, Text, View, Document, StyleSheet, Font, Image} from '@react-pdf/renderer';
-import {useCallback, useState} from 'react';
-import {Message} from '@renderer/lib/types';
+//import {useCallback, useState} from 'react';
+import {Message} from '../renderer/src/lib/types';
+
+import LiterataRegular from '../../resources/Literata/static/Literata-Regular.ttf?asset';
+import LiterataItalic from '../../resources/Literata/static/Literata-Italic.ttf?asset';
+import SanFrancisco from '../../resources/SFUIText-Regular.otf?asset';
 
 function groupMessagesByMonth(messages: Message[]): Record<string, Message[]> {
 	const grouped: Record<string, Message[]> = {};
@@ -15,19 +19,19 @@ function groupMessagesByMonth(messages: Message[]): Record<string, Message[]> {
 
 Font.register({
 	family: 'Literata',
-	src: '../assets/Literata/static/Literata-Regular.ttf'
+	src: LiterataRegular
 });
 
 Font.register({
 	family: 'Literata',
-	src: '../assets/Literata/static/Literata-Italic.ttf',
+	src: LiterataItalic,
 	fontStyle: 'italic',
 	fontWeight: 400
 });
 
 Font.register({
 	family: 'SanFrancisco',
-	src: '../assets/SFUIText-Regular.otf',
+	src: SanFrancisco,
 	fontStyle: 'normal',
 	fontWeight: 'normal'
 });
@@ -141,7 +145,7 @@ function Book({
 	messages: Message[];
 }): React.ReactElement {
 	const grouped = groupMessagesByMonth(messages);
-
+	/*
 	const [ToC, setToC] = useState<{title: string; page: number}[]>([]);
 
 	const addEntry = useCallback((title: string, page: number) => {
@@ -150,8 +154,8 @@ function Book({
 			return [...prevToC, {title, page}];
 		});
 	}, []);
-
-	console.log(grouped);
+*/
+	//console.log(grouped);
 
 	return (
 		<Document title={data.title}>
@@ -180,13 +184,13 @@ function Book({
 			<Page size="A5" style={[styles.page]}>
 				<View>
 					<Text style={[styles.tocPageTitle]}>Table of Contents</Text>
-					{ToC.sort((a, b) => a.page - b.page).map((entry: {title: string; page: number}, i: number) => (
+					{/*ToC.sort((a, b) => a.page - b.page).map((entry: {title: string; page: number}, i: number) => (
 						<View key={i} style={styles.tocEntry}>
 							<Text style={styles.tocTitle}>{entry.title}</Text>
 							<View style={styles.tocDots} />
 							<Text style={styles.tocPageNumber}>{entry.page + 1}</Text>
 						</View>
-					))}
+					))*/}
 				</View>
 			</Page>
 			{Object.keys(grouped)
@@ -197,14 +201,19 @@ function Book({
 						<View>
 							<Text
 								style={[styles.monthPageTitle]}
-								render={({pageNumber}) => {
-									const title = new Intl.DateTimeFormat('en-GB', {
-										year: 'numeric',
-										month: 'long'
-									}).format(new Date(month));
-									addEntry(title, pageNumber);
-									return title;
-								}}
+								render={() =>
+									/*{
+										pageNumber
+									}*/
+									{
+										const title = new Intl.DateTimeFormat('en-GB', {
+											year: 'numeric',
+											month: 'long'
+										}).format(new Date(month));
+										//addEntry(title, pageNumber);
+										return title;
+									}
+								}
 							/>
 							{grouped[month].map((message, j) => (
 								<View
@@ -212,10 +221,9 @@ function Book({
 									wrap={false}
 									style={[styles.message, message.from_me_flag ? styles.meText : styles.themText]}
 									minPresenceAhead={100}>
-									{message.new_attachment_path &&
-									(message.new_attachment_path.endsWith('.png') || message.new_attachment_path.endsWith('.jpg')) ? (
+									{message.attachment_uri ? (
 										<>
-											<Image src={message.new_attachment_path} style={[styles.attachmentImg]} />
+											<Image src={message.attachment_uri} style={[styles.attachmentImg]} />
 											<Text>{message.message_text.replaceAll(`\uFFFC`, '')}</Text>
 										</>
 									) : message.attachment_path?.includes('.caf') ? (
@@ -232,7 +240,7 @@ function Book({
 											const date: string =
 												fullDate.getDate() + '/' + (fullDate.getMonth() + 1) + '/' + fullDate.getFullYear();
 											const time: string = fullDate.getHours() + ':' + fullDate.getMinutes();
-											return `${date} \u2022 ${time}`;
+											return date + ' \u2022 ' + time;
 										}}
 									/>
 								</View>

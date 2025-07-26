@@ -8,9 +8,10 @@ export default defineConfig({
 		build: {
 			rollupOptions: {
 				input: {
-					index: resolve('src/main/index.ts'),
+					index: resolve('src/main/index.tsx'),
 					'attachment.worker': resolve('src/main/attachment.worker.ts')
-				}
+				},
+				external: ['sharp']
 			}
 		}
 	},
