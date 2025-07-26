@@ -61,7 +61,6 @@ ipcMain.handle(
 					c.chat_identifier IN (${placeholders})
 				ORDER BY
 					m.date;
-				LIMIT 20; -- For testing only;
 			`;
 			const stmt = db.prepare(sql);
 			const messages = stmt.all(...contacts) as Message[];
