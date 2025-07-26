@@ -1,8 +1,6 @@
 import folder from './assets/folder.svg';
 import computer from './assets/computer.svg';
 import write from './assets/write.svg';
-
-import load from './assets/load.svg';
 import {useEffect, useState} from 'react';
 import Select, {MultiValue} from 'react-select';
 
