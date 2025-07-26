@@ -1,6 +1,6 @@
 import {app, shell, BrowserWindow, ipcMain, dialog} from 'electron';
 import os from 'os';
-import fs, {existsSync} from 'fs';
+import {existsSync} from 'fs';
 import {join} from 'path';
 import Database, {Database as DatabaseType} from 'better-sqlite3';
 import {Message} from '../renderer/src/lib/types';
@@ -61,6 +61,7 @@ ipcMain.handle(
 					c.chat_identifier IN (${placeholders})
 				ORDER BY
 					m.date;
+				LIMIT 20; -- For testing only;
 			`;
 			const stmt = db.prepare(sql);
 			const messages = stmt.all(...contacts) as Message[];
@@ -146,22 +147,6 @@ ipcMain.handle(
 		}
 	}
 );
-
-ipcMain.handle('save-pdf', (_, data: Uint8Array) => {
-	const saveLoc = dialog.showSaveDialogSync({
-		properties: ['createDirectory'],
-		defaultPath: 'weMessaged-book.pdf'
-	});
-
-	if (saveLoc) {
-		try {
-			fs.writeFileSync(saveLoc, Buffer.from(data));
-		} catch (e: unknown) {
-			dialog.showErrorBox('Error saving file', (e as Error).message);
-			console.error(e);
-		}
-	}
-});
 
 function createWindow(): void {
 	// Create the browser window.
