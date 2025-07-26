@@ -10,6 +10,7 @@ function App(): React.JSX.Element {
 		title: string;
 		acknowledgements: string;
 	}>({authors: [], title: 'weMessaged Book', acknowledgements: ''});
+
 	const [messages, setMessages] = useState<Message[]>([]);
 
 	useEffect(() => {
