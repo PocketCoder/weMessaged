@@ -34,7 +34,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--max-old-space-size=4096" pnpm install
+        run: NODE_OPTIONS="--max-old-space-size=8192" pnpm install
 
       - name: Lint
         run: pnpm lint
