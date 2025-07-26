@@ -9,4 +9,5 @@ export interface Message {
 	converted_date?: string;
 	attachment_path?: string | null; // Path to the attachment, if one exists
 	attachment_uri?: string | null;
+	new_attachment_path?: string | null;
 }

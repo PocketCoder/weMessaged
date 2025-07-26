@@ -80,20 +80,20 @@ ipcMain.handle(
 						const worker = new Worker(join(__dirname, 'attachment.worker.js'));
 						let terminated = false;
 
-						function resolveAndTerminate(uri: string | null): void {
+						function resolveAndTerminate(newPath: string | null): void {
 							if (terminated) return;
 							terminated = true;
 							resolve({
 								...m,
 								converted_date: convertAppleDateInt(m.apple_date_int),
 								attachment_path: originalAttachmentPath,
-								attachment_uri: uri
+								new_attachment_path: newPath
 							});
 							worker.terminate();
 						}
 
-						worker.on('message', (uri: string | null) => {
-							resolveAndTerminate(uri);
+						worker.on('message', (newPath: string | null) => {
+							resolveAndTerminate(newPath);
 						});
 
 						worker.on('error', (err) => {
@@ -108,7 +108,8 @@ ipcMain.handle(
 									...m,
 									converted_date: convertAppleDateInt(m.apple_date_int),
 									attachment_path: null,
-									attachment_uri: null
+									attachment_uri: null,
+									new_attachment_path: null
 								});
 							}
 						});

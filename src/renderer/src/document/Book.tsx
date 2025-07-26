@@ -212,9 +212,10 @@ function Book({
 									wrap={false}
 									style={[styles.message, message.from_me_flag ? styles.meText : styles.themText]}
 									minPresenceAhead={100}>
-									{message.attachment_uri ? (
+									{message.new_attachment_path &&
+									(message.new_attachment_path.endsWith('.png') || message.new_attachment_path.endsWith('.jpg')) ? (
 										<>
-											<Image src={message.attachment_uri} style={[styles.attachmentImg]} />
+											<Image src={message.new_attachment_path} style={[styles.attachmentImg]} />
 											<Text>{message.message_text.replaceAll(`\uFFFC`, '')}</Text>
 										</>
 									) : message.attachment_path?.includes('.caf') ? (

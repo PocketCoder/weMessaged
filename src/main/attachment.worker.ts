@@ -1,6 +1,6 @@
 import {parentPort} from 'worker_threads';
-import fs, {existsSync} from 'fs';
-import {fileTypeFromBuffer} from 'file-type';
+import fs from 'fs';
+import {basename} from 'path';
 
 interface WorkerData {
 	attachmentPath: string;
@@ -8,7 +8,7 @@ interface WorkerData {
 }
 
 async function processAttachment({attachmentPath, sessionDataPath}: WorkerData): Promise<string | null> {
-	if (!attachmentPath || !existsSync(attachmentPath)) return null;
+	if (!attachmentPath || !fs.existsSync(attachmentPath)) return null;
 	try {
 		const {fileTypeFromFile} = await import('file-type');
 		const heicConvert = (await import('heic-convert')).default;
@@ -18,21 +18,30 @@ async function processAttachment({attachmentPath, sessionDataPath}: WorkerData):
 
 		if (!fs.existsSync(sessionDataPath)) fs.mkdirSync(sessionDataPath, {recursive: true});
 
-		let uri: string;
+		let newPath: string;
 
 		if (fileType?.ext == 'heic') {
+			const fileName = basename(attachmentPath).replace(/\.heic$/i, '');
 			const inputBuffer = fs.readFileSync(attachmentPath);
 			const outputBuffer = await heicConvert({
 				buffer: inputBuffer as any,
 				format: 'PNG'
 			});
-			uri = `data:image/png;base64,${Buffer.from(outputBuffer).toString('base64')}`;
+			fs.writeFileSync(`${sessionDataPath}/${fileName}.png`, outputBuffer as any);
+			newPath = `${sessionDataPath}/${fileName}.png`;
+		} else if (fileType?.ext == 'jpg' || fileType?.ext == 'jpeg') {
+			const fileName = basename(attachmentPath).replace(/\.jpeg$/i, '.jpg');
+			fs.copyFileSync(attachmentPath, `${sessionDataPath}/${fileName}`);
+			newPath = `${sessionDataPath}/${fileName}`;
+		} else if (fileType?.ext == 'png') {
+			const fileName = basename(attachmentPath);
+			fs.copyFileSync(attachmentPath, `${sessionDataPath}/${fileName}`);
+			newPath = `${sessionDataPath}/${fileName}`;
 		} else {
-			const buffer = fs.readFileSync(attachmentPath);
-			const filetype = await fileTypeFromBuffer(buffer);
-			uri = `data:${filetype?.mime};base64,${buffer.toString('base64')}`;
+			// TODO: What to do with GIFs?
+			return null;
 		}
-		return uri;
+		return newPath;
 	} catch (e) {
 		console.error(`Could not process attachment ${attachmentPath}:`, e);
 		return null;
