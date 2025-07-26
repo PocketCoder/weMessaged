@@ -71,6 +71,39 @@ function App(): React.JSX.Element {
 		checkDefault();
 	}, []);
 
+	if (loading)
+		return (
+			<div id="loading">
+				<svg width="33" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path
+						id="dot-1"
+						d="M25.9951 14.47V19.05H30.5651V14.47H25.9951ZM29.0451 17.52H27.5151V16H29.0501L29.0451 17.52Z"
+						fill="#000001"
+					/>
+					<path
+						id="dot-2"
+						d="M27.5151 23.62H22.9501V28.19H27.5201L27.5151 23.62ZM25.9951 26.66H24.4751V25.14H25.9951V26.66Z"
+						fill="#000001"
+					/>
+					<path
+						id="dot-3"
+						d="M29.0502 11.43V3.81H21.4302V11.43H29.0502ZM22.9502 5.33H27.5202V9.9H22.9502V5.33Z"
+						fill="#000001"
+					/>
+					<path
+						id="dot-4"
+						d="M19.8952 0.759995H12.2852V8.37999H19.8952V0.759995ZM18.3752 6.84999H13.8052V2.27999H18.3752V6.84999Z"
+						fill="#000001"
+					/>
+					<path id="dot-5" d="M18.3752 26.66H13.8052V31.24H18.3752V26.66Z" fill="#000001" />
+					<path id="dot-6" d="M9.23516 23.62H4.66516V28.19H9.23516V23.62Z" fill="#000001" />
+					<path id="dot-7" d="M7.70518 6.84999H6.18518V8.37999H7.70518V6.84999Z" fill="#000001" />
+					<path id="dot-8" d="M4.66513 16H3.13513V17.52H4.66513V16Z" fill="#000001" />
+				</svg>
+				<span>Loading...</span>
+			</div>
+		);
+
 	return (
 		<>
 			{phoneNumbers.length === 0 ? <span>1. Select a database to begin...</span> : <></>}
@@ -113,7 +146,6 @@ function App(): React.JSX.Element {
 					</button>
 				</>
 			)}
-			{loading ? <span>Loading...</span> : <></>}
 		</>
 	);
 }
