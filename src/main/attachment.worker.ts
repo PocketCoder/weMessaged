@@ -1,5 +1,6 @@
 import {parentPort} from 'worker_threads';
 import fs from 'fs';
+import sharp from 'sharp';
 
 interface WorkerData {
 	attachmentPath: string;
@@ -32,6 +33,24 @@ async function processAttachment({attachmentPath}: WorkerData): Promise<string |
 		}
 
 		if (!mimeType) return null;
+
+		if (mimeType.startsWith('image/')) {
+			let image = sharp(buffer);
+
+			const metadata = await image.metadata();
+
+			if (metadata.width && metadata.width > 1000) {
+				image = image.resize(1000);
+			}
+
+			if (mimeType === 'image/jpeg') {
+				buffer = await image.jpeg({quality: 80}).toBuffer();
+			} else if (mimeType === 'image/png') {
+				buffer = await image.png({quality: 80, compressionLevel: 9}).toBuffer();
+			} else if (mimeType === 'image/webp') {
+				buffer = await image.webp({quality: 80}).toBuffer();
+			}
+		}
 
 		const base64 = buffer.toString('base64');
 		return `data:${mimeType};base64,${base64}`;
