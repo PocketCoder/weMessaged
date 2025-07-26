@@ -33,6 +33,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Clear pnpm cache
+        run: pnpm store prune
+
       - name: Install dependencies
         run: NODE_OPTIONS="--max-old-space-size=8192" pnpm install
 
