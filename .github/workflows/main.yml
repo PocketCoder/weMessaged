@@ -1,9 +1,8 @@
-<<<<<<< HEAD
 name: Electron CI/CD
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "dev"]
     tags: ["v*.*.*"]
   pull_request:
     branches: ["main"]
@@ -72,5 +71,3 @@ jobs:
             release-artifacts/**/*
           draft: true
           token: ${{ secrets.GH_TOKEN }}
-=======
->>>>>>> 75de8c1 (.)
