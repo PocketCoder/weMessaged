@@ -70,4 +70,4 @@ jobs:
           files: release-artifacts/**/*
           draft: false
           generate_release_notes: true
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
