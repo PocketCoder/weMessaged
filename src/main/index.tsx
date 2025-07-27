@@ -152,8 +152,8 @@ function createWindow(): void {
 	const mainWindow = new BrowserWindow({
 		titleBarStyle: 'hidden',
 		...(process.platform !== 'darwin' ? {titleBarOverlay: true} : {}),
-		width: 900,
-		height: 670,
+		width: 412,
+		height: 668,
 		show: false,
 		autoHideMenuBar: true,
 		webPreferences: {

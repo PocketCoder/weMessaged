@@ -106,46 +106,98 @@ function App(): React.JSX.Element {
 
 	return (
 		<>
-			{phoneNumbers.length === 0 ? <span>1. Select a database to begin...</span> : <></>}
-			<div id="button-container">
-				<button className={'left'} onClick={handleDefaultClick} disabled={!exists}>
-					<img src={computer} width="32px" height="32px" alt="computer" />
-					Default Database
-				</button>
-				<button className="right" disabled>
-					Choose Backup File
-					<img src={folder} width="32px" height="32px" alt="folder" />
-				</button>
-			</div>
-			{phoneNumbers.length === 0 ? (
-				<></>
-			) : (
-				<>
-					<div id="choose-contacts">
-						<span>2. Choose the contacts to include in your book...</span>
-						<div id="create-container">
-							<Select
-								isMulti
-								name="contacts"
-								options={phoneNumbers}
-								classNamePrefix={'select'}
-								onChange={(selected: MultiValue<ContactOption>) => setSelectedContacts(selected as ContactOption[])}
-							/>
-						</div>
-					</div>
-					<div id="collect-meta">
-						<span>3. Add in some details...</span>
-						<input placeholder="Book title" onChange={(e) => setTitle(e.target.value)} />
-						<input placeholder="Acknowledgements" onChange={(e) => setAcknowledgements(e.target.value)} />
-						<input placeholder="Their name" onChange={(e) => setTheirName(e.target.value)} />
-						<input placeholder="Your name" onChange={(e) => setYourName(e.target.value)} />
-					</div>
-					<button onClick={handleCreateClick}>
-						Create
-						<img src={write} width={'21px'} height={'21px'} alt="Pen" />
+			<section>
+				<h1>1. Data Source</h1>
+				<div id="button-container">
+					<button className={'left'} onClick={handleDefaultClick} disabled={!exists}>
+						<img src={computer} width="32px" height="32px" alt="computer" />
+						Default Database
 					</button>
-				</>
-			)}
+					<button className="right" disabled>
+						Choose Backup File
+						<img src={folder} width="32px" height="32px" alt="folder" />
+					</button>
+				</div>
+			</section>
+			<section id="choose-contacts">
+				<h1>2. Choose the contacts to include in your book...</h1>
+				<Select
+					isMulti
+					name="contacts"
+					options={phoneNumbers}
+					classNamePrefix={'select'}
+					onChange={(selected: MultiValue<ContactOption>) => setSelectedContacts(selected as ContactOption[])}
+					styles={{
+						control: (base, state) => ({
+							...base,
+							backgroundColor: '#f9f8f6',
+							borderColor: state.isFocused ? '#000' : '#ccc',
+							borderWidth: '1px',
+							borderRadius: '5px',
+							boxShadow: 'none',
+							minHeight: '60px',
+							width: '100%',
+							fontFamily: 'inherit',
+							fontSize: '14px',
+							padding: '2px 4px',
+							opacity: state.isDisabled ? 0.6 : 1
+						}),
+						multiValue: (base) => ({
+							...base,
+							backgroundColor: '#e6e6e6',
+							borderRadius: '5px',
+							padding: '2px 6px',
+							fontFamily: 'inherit',
+							fontSize: '16px'
+						}),
+						multiValueLabel: (base) => ({
+							...base,
+							color: '#000',
+							padding: '0 4px',
+							fontFamily: 'inherit'
+						}),
+						multiValueRemove: (base) => ({
+							...base,
+							color: '#555',
+							cursor: 'pointer',
+							':hover': {
+								color: '#000'
+							}
+						}),
+						placeholder: (base) => ({
+							...base,
+							fontStyle: 'italic'
+						}),
+						menu: (base) => ({
+							...base,
+							borderRadius: '6px',
+							backgroundColor: '#fff',
+							boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
+							fontFamily: 'inherit',
+							zIndex: 10
+						}),
+						option: (base, state) => ({
+							...base,
+							cursor: 'pointer',
+							backgroundColor: state.isFocused ? '#e6e6e6' : 'default'
+						})
+					}}
+					isDisabled={phoneNumbers.length === 0}
+				/>
+			</section>
+			<section id="collect-meta">
+				<h1>3. Add in some details...</h1>
+				<input placeholder="Book title" onChange={(e) => setTitle(e.target.value)} />
+				<input placeholder="Their name" onChange={(e) => setTheirName(e.target.value)} />
+				<input placeholder="Your name" onChange={(e) => setYourName(e.target.value)} />
+				<textarea placeholder="Acknowledgements" onChange={(e) => setAcknowledgements(e.target.value)} />
+			</section>
+			<section id="create-button-container">
+				<button onClick={handleCreateClick} disabled={selectedContacts.length === 0}>
+					Create
+					<img src={write} width={'21px'} height={'21px'} alt="Pen" />
+				</button>
+			</section>
 		</>
 	);
 }
