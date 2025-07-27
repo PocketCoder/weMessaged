@@ -212,14 +212,14 @@ function Book({
 									{message.attachment_uri ? (
 										<>
 											<Image src={message.attachment_uri} style={[styles.attachmentImg]} />
-											<Text>{message.message_text.replaceAll(`\uFFFC`, '')}</Text>
+											<Text>{message.message_text?.replaceAll(`\uFFFC`, '')}</Text>
 										</>
 									) : message.attachment_path?.includes('.caf') ? (
 										<Text>Audio Message</Text>
 									) : message.attachment_path?.includes('.MOV') || message.attachment_path?.includes('.mp4') ? (
 										<Text>Video Message</Text>
 									) : (
-										<Text>{message.message_text.replaceAll(`\uFFFC`, '')}</Text>
+										<Text>{message.message_text?.replaceAll(`\uFFFC`, '')}</Text>
 									)}
 									<Text
 										style={[styles.dateText]}

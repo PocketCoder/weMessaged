@@ -17,7 +17,7 @@ ipcMain.handle('find-default', (): boolean => {
 	return existsSync(`/Users/${os.userInfo().username}/Library/Messages/chat.db`);
 });
 
-ipcMain.handle('get-contacts', (): {success: boolean; contacts?: {id: string}[]; error?: unknown} => {
+ipcMain.handle('get-local-contacts', (): {success: boolean; contacts?: {id: string}[]; error?: unknown} => {
 	try {
 		db = new Database(`/Users/${os.userInfo().username}/Library/Messages/chat.db`, {fileMustExist: true});
 		const contacts = db.prepare('SELECT DISTINCT id FROM handle;').all() as {
@@ -25,7 +25,29 @@ ipcMain.handle('get-contacts', (): {success: boolean; contacts?: {id: string}[];
 		}[];
 		return {success: true, contacts: contacts};
 	} catch (err: unknown) {
+		console.error('Error opening local chat.db', err);
 		return {success: false, error: (err as Error).message};
+	}
+});
+
+ipcMain.handle('get-backup-contacts', (): {success: boolean; contacts?: {id: string}[]; error?: unknown} => {
+	const folderLoc = dialog.showOpenDialogSync({
+		properties: ['openDirectory']
+	});
+
+	if (folderLoc) {
+		try {
+			db = new Database(`${folderLoc}/3d/3d0d7e5fb2ce288813306e4d4636395e047a3d28`, {fileMustExist: true});
+			const contacts = db.prepare('SELECT DISTINCT id FROM handle;').all() as {
+				id: string;
+			}[];
+			return {success: true, contacts: contacts};
+		} catch (e) {
+			console.error('Error opening backup folder db', e);
+			return {success: false, error: (e as Error).message};
+		}
+	} else {
+		return {success: false, error: 'No Folder Location Chosen'};
 	}
 });
 
@@ -144,6 +166,8 @@ ipcMain.handle(
 				console.error(e);
 			}
 		}
+
+		// TODO: Else?
 	}
 );
 
@@ -152,8 +176,8 @@ function createWindow(): void {
 	const mainWindow = new BrowserWindow({
 		titleBarStyle: 'hidden',
 		...(process.platform !== 'darwin' ? {titleBarOverlay: true} : {}),
-		width: 900,
-		height: 670,
+		width: 412,
+		height: 668,
 		show: false,
 		autoHideMenuBar: true,
 		webPreferences: {
