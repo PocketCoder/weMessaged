@@ -4,7 +4,8 @@ import {Message} from '../renderer/src/lib/types';
 
 // Custom APIs for renderer
 const api = {
-	readFileAtPath: (filePath: string) => ipcRenderer.invoke('get-contacts', filePath),
+	getLocalContacts: (filePath: string) => ipcRenderer.invoke('get-local-contacts', filePath),
+	getBackupContacts: (filePath: string) => ipcRenderer.invoke('get-backup-contacts', filePath),
 	findDefault: () => ipcRenderer.invoke('find-default'),
 	getMessages: (contacts: string[]) => ipcRenderer.invoke('get-messages', contacts),
 	generatePDF: (data: {authors: string[]; title: string; acknowledgements: string}, messages: Message[]) =>

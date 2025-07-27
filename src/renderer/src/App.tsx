@@ -25,7 +25,22 @@ function App(): React.JSX.Element {
 
 	async function handleDefaultClick(): Promise<void> {
 		setLoading(true);
-		const result = await window.electron.ipcRenderer.invoke('get-contacts');
+		const result = await window.electron.ipcRenderer.invoke('get-local-contacts');
+		setLoading(false);
+		if (result.success) {
+			const options = result.contacts.map((item: {id: string}) => ({
+				value: item.id,
+				label: item.id
+			}));
+			setPhoneNumbers(options);
+		} else {
+			console.error('Error reading file:', result.error);
+		}
+	}
+
+	async function handleFileClick(): Promise<void> {
+		setLoading(true);
+		const result = await window.electron.ipcRenderer.invoke('get-backup-contacts');
 		setLoading(false);
 		if (result.success) {
 			const options = result.contacts.map((item: {id: string}) => ({
@@ -113,7 +128,7 @@ function App(): React.JSX.Element {
 						<img src={computer} width="32px" height="32px" alt="computer" />
 						Default Database
 					</button>
-					<button className="right" disabled>
+					<button className="right" onClick={handleFileClick}>
 						Choose Backup File
 						<img src={folder} width="32px" height="32px" alt="folder" />
 					</button>
