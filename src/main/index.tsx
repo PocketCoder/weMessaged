@@ -12,6 +12,7 @@ import Book from './Book';
 import {renderToFile} from '@react-pdf/renderer';
 
 let db: DatabaseType;
+let baseFolder: string;
 
 ipcMain.handle('find-default', (): boolean => {
 	return existsSync(`/Users/${os.userInfo().username}/Library/Messages/chat.db`);
@@ -36,6 +37,7 @@ ipcMain.handle('get-backup-contacts', (): {success: boolean; contacts?: {id: str
 	});
 
 	if (folderLoc) {
+		baseFolder = folderLoc[0];
 		try {
 			db = new Database(`${folderLoc}/3d/3d0d7e5fb2ce288813306e4d4636395e047a3d28`, {fileMustExist: true});
 			const contacts = db.prepare('SELECT DISTINCT id FROM handle;').all() as {
@@ -53,7 +55,11 @@ ipcMain.handle('get-backup-contacts', (): {success: boolean; contacts?: {id: str
 
 ipcMain.handle(
 	'get-messages',
-	async (_, contacts: string[]): Promise<{success: boolean; messages?: Message[]; error?: unknown}> => {
+	async (
+		_,
+		contacts: string[],
+		isBackup?: boolean
+	): Promise<{success: boolean; messages?: Message[]; error?: unknown}> => {
 		const placeholders = contacts.map(() => '?').join(',');
 		try {
 			if (contacts.length === 0) {
@@ -91,7 +97,7 @@ ipcMain.handle(
 				messages.map(async (m) => {
 					const originalAttachmentPath = m.attachment_path ? m.attachment_path.replace('~', homeDir) : null;
 					return new Promise((resolve) => {
-						if (!originalAttachmentPath || !existsSync(originalAttachmentPath)) {
+						if (!originalAttachmentPath || (!isBackup && !existsSync(originalAttachmentPath))) {
 							resolve({
 								...m,
 								converted_date: convertAppleDateInt(m.apple_date_int),
@@ -137,7 +143,9 @@ ipcMain.handle(
 							}
 						});
 						worker.postMessage({
-							attachmentPath: originalAttachmentPath
+							attachmentPath: originalAttachmentPath,
+							isBackup: isBackup,
+							baseFolder: baseFolder
 						});
 					});
 				})

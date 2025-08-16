@@ -18,6 +18,7 @@ function App(): React.JSX.Element {
 	const [acknowledgements, setAcknowledgements] = useState<string>('');
 	const [yourName, setYourName] = useState<string>('');
 	const [theirName, setTheirName] = useState<string>('');
+	const [isBackup, setIsBackup] = useState<boolean>(false);
 
 	async function findDefault(): Promise<boolean> {
 		return await window.electron.ipcRenderer.invoke('find-default');
@@ -48,6 +49,7 @@ function App(): React.JSX.Element {
 				label: item.id
 			}));
 			setPhoneNumbers(options);
+			setIsBackup(true);
 		} else {
 			console.error('Error reading file:', result.error);
 		}
@@ -60,7 +62,7 @@ function App(): React.JSX.Element {
 		}
 		const contactIds = selectedContacts.map((contact) => contact.value);
 		setLoading(true);
-		const result = await window.electron.ipcRenderer.invoke('get-messages', contactIds);
+		const result = await window.electron.ipcRenderer.invoke('get-messages', contactIds, isBackup);
 		setLoading(false);
 		if (!result.success) console.error('Error getting messages:', result.error);
 		try {

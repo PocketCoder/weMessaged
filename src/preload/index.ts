@@ -7,7 +7,7 @@ const api = {
 	getLocalContacts: (filePath: string) => ipcRenderer.invoke('get-local-contacts', filePath),
 	getBackupContacts: (filePath: string) => ipcRenderer.invoke('get-backup-contacts', filePath),
 	findDefault: () => ipcRenderer.invoke('find-default'),
-	getMessages: (contacts: string[]) => ipcRenderer.invoke('get-messages', contacts),
+	getMessages: (contacts: string[], isBackup: boolean) => ipcRenderer.invoke('get-messages', contacts, isBackup),
 	generatePDF: (data: {authors: string[]; title: string; acknowledgements: string}, messages: Message[]) =>
 		ipcRenderer.invoke('generate-pdf', data, messages)
 };
