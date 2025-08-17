@@ -246,10 +246,7 @@ function Book({
 									<View
 										key={j}
 										wrap={false}
-										style={[
-											styles.message,
-											message[0].from_me_flag ? styles.meText : styles.themText
-										]}>
+										style={[styles.message, message[0].from_me_flag ? styles.meText : styles.themText]}>
 										<View style={styles.attachmentContainer}>
 											{message.map((attachment, k) => (
 												<Image key={k} src={attachment.attachment_uri!} style={[styles.attachmentImg]} />
@@ -293,7 +290,7 @@ function Book({
 												const fullDate: Date = new Date(message.converted_date as string);
 												const date: string =
 													fullDate.getDate() + '/' + (fullDate.getMonth() + 1) + '/' + fullDate.getFullYear();
-												const time: string = 
+												const time: string =
 													String(fullDate.getHours()).padStart(2, '0') +
 													':' +
 													String(fullDate.getMinutes()).padStart(2, '0');
