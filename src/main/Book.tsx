@@ -76,14 +76,16 @@ const styles = StyleSheet.create({
 		fontStyle: 'italic'
 	},
 	attachmentImg: {
-		width: '30vw',
-		alignSelf: 'flex-end'
+		width: '25%',
+		margin: 2
 	},
 	meText: {
-		textAlign: 'right'
+		textAlign: 'right',
+		alignItems: 'flex-end'
 	},
 	themText: {
-		textAlign: 'left'
+		textAlign: 'left',
+		alignItems: 'flex-start'
 	},
 	pageNumber: {
 		position: 'absolute',
@@ -114,8 +116,46 @@ const styles = StyleSheet.create({
 	},
 	tocPageNumber: {
 		fontSize: 11
+	},
+	attachmentContainer: {
+		flexDirection: 'row',
+		flexWrap: 'wrap'
 	}
 });
+
+function groupConsecutiveAttachments(messages: Message[]): (Message | Message[])[] {
+	const grouped: (Message | Message[])[] = [];
+	let currentAttachmentGroup: Message[] = [];
+
+	for (let i = 0; i < messages.length; i++) {
+		const msg = messages[i];
+		const nextMsg = messages[i + 1];
+
+		if (msg.attachment_uri) {
+			currentAttachmentGroup.push(msg);
+			if (
+				!nextMsg ||
+				!nextMsg.attachment_uri ||
+				new Date(msg.converted_date!).getTime() !== new Date(nextMsg.converted_date!).getTime()
+			) {
+				grouped.push(currentAttachmentGroup);
+				currentAttachmentGroup = [];
+			}
+		} else {
+			if (currentAttachmentGroup.length > 0) {
+				grouped.push(currentAttachmentGroup);
+				currentAttachmentGroup = [];
+			}
+			grouped.push(msg);
+		}
+	}
+
+	if (currentAttachmentGroup.length > 0) {
+		grouped.push(currentAttachmentGroup);
+	}
+
+	return grouped;
+}
 
 function Book({
 	data,
@@ -132,8 +172,6 @@ function Book({
 		if (ToC.find((entry) => entry.title === title)) return ToC;
 		return [...ToC, {title, page}];
 	};
-
-	//console.log(grouped);
 
 	return (
 		<Document title={data.title}>
@@ -193,7 +231,7 @@ function Book({
 								{i + 1}
 							</Text>
 							<Text
-								style={[styles.monthPageTitle, {paddingBottom: 50, paddingTop: 10}]}
+								style={[styles.monthPageTitle, {paddingBottom: 25, paddingTop: 10}]}
 								render={({pageNumber}) => {
 									const title = new Intl.DateTimeFormat('en-GB', {
 										year: 'numeric',
@@ -203,36 +241,68 @@ function Book({
 									return title;
 								}}
 							/>
-							{grouped[month].map((message, j) => (
-								<View
-									key={j}
-									wrap={false}
-									style={[styles.message, message.from_me_flag ? styles.meText : styles.themText]}
-									minPresenceAhead={100}>
-									{message.attachment_uri ? (
-										<>
-											<Image src={message.attachment_uri} style={[styles.attachmentImg]} />
+							{groupConsecutiveAttachments(grouped[month]).map((message, j) =>
+								Array.isArray(message) ? (
+									<View
+										key={j}
+										wrap={false}
+										style={[
+											styles.message,
+											message[0].from_me_flag ? styles.meText : styles.themText
+										]}>
+										<View style={styles.attachmentContainer}>
+											{message.map((attachment, k) => (
+												<Image key={k} src={attachment.attachment_uri!} style={[styles.attachmentImg]} />
+											))}
+										</View>
+										<Text
+											style={[styles.dateText]}
+											render={() => {
+												const fullDate: Date = new Date(message[0].converted_date as string);
+												const date: string =
+													fullDate.getDate() + '/' + (fullDate.getMonth() + 1) + '/' + fullDate.getFullYear();
+												const time: string =
+													String(fullDate.getHours()).padStart(2, '0') +
+													':' +
+													String(fullDate.getMinutes()).padStart(2, '0');
+												return date + ' \u2022 ' + time;
+											}}
+										/>
+									</View>
+								) : (
+									<View
+										key={j}
+										wrap={false}
+										style={[styles.message, message.from_me_flag ? styles.meText : styles.themText]}
+										minPresenceAhead={100}>
+										{message.attachment_uri ? (
+											<View>
+												<Image src={message.attachment_uri} style={[styles.attachmentImg]} />
+												<Text>{message.message_text?.replaceAll(`\uFFFC`, '')}</Text>
+											</View>
+										) : message.attachment_path?.includes('.caf') ? (
+											<Text>Audio Message</Text>
+										) : message.attachment_path?.includes('.MOV') || message.attachment_path?.includes('.mp4') ? (
+											<Text>Video Message</Text>
+										) : (
 											<Text>{message.message_text?.replaceAll(`\uFFFC`, '')}</Text>
-										</>
-									) : message.attachment_path?.includes('.caf') ? (
-										<Text>Audio Message</Text>
-									) : message.attachment_path?.includes('.MOV') || message.attachment_path?.includes('.mp4') ? (
-										<Text>Video Message</Text>
-									) : (
-										<Text>{message.message_text?.replaceAll(`\uFFFC`, '')}</Text>
-									)}
-									<Text
-										style={[styles.dateText]}
-										render={() => {
-											const fullDate: Date = new Date(message.converted_date as string);
-											const date: string =
-												fullDate.getDate() + '/' + (fullDate.getMonth() + 1) + '/' + fullDate.getFullYear();
-											const time: string = fullDate.getHours() + ':' + fullDate.getMinutes();
-											return date + ' \u2022 ' + time;
-										}}
-									/>
-								</View>
-							))}
+										)}
+										<Text
+											style={[styles.dateText]}
+											render={() => {
+												const fullDate: Date = new Date(message.converted_date as string);
+												const date: string =
+													fullDate.getDate() + '/' + (fullDate.getMonth() + 1) + '/' + fullDate.getFullYear();
+												const time: string = 
+													String(fullDate.getHours()).padStart(2, '0') +
+													':' +
+													String(fullDate.getMinutes()).padStart(2, '0');
+												return date + ' \u2022 ' + time;
+											}}
+										/>
+									</View>
+								)
+							)}
 						</View>
 					</Page>
 				))}
